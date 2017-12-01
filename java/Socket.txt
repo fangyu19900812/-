@@ -1,0 +1,17 @@
+Socket
+服务器			 
+	ServerSocket serverSocket = ServerSocket(port)
+	Socket socket = ServerSocket.accept()
+	OutputStream os = socket.getInputStream();
+	InputStream is = socket.getOutputStream();
+	os.close();
+	is.close();
+	socket.close();
+	serverSocket.close();
+客户端
+	Socket socket = new Socket("localhost",port);
+	InputStream is = socket.getInputStream();
+	OutputStream os = socket.getOutputStream();
+	os.close();
+	is.close();
+	socket.close();

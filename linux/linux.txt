@@ -1,0 +1,41 @@
+2017-5-18：
+	su  			——后面不加用户是默认切到 root
+	su [user_name]  	——是取得user_name的特权，以user_name的身份执行程序，但保留原来用户环境
+	su - [user_name]  	——是切换到user_name账号使用，使用的是user_name用户的环境变量
+
+	也就是说su只能获得root的执行权限，不能获得环境变量
+	而su - 是切换到root并获得root的环境变量及执行权限 
+
+
+	su 和 sudo 的区别：
+	1.共同点：都是root用户的权限；
+	2.不同点：su仅仅取得root权限，工作环境不变，还是在切换之前用户的工作环境；sudo是完全取得root的权限和root的工作环境。
+
+	linux中文件颜色，蓝色，白色等各自代表的含义
+ 
+	绿色文件---------- 可执行文件，可执行的程序 
+ 
+	红色文件-----------压缩文件或者包文件
+ 
+	蓝色文件----------目录  www.2cto.com  
+ 
+	白色文件----------一般性文件，如文本文件，配置文件，源码文件等 
+ 
+	浅蓝色文件----------链接文件，主要是使用ln命令建立的文件
+
+	常用操作命令http://www.cnblogs.com/laov/p/3541414.html#usergroup
+	
+	echo创建带有内容的文件 http://blog.csdn.net/xukai871105/article/details/35834703
+
+	vim 命令图解 http://jingyan.baidu.com/article/48206aeaf07f37216ad6b3a6.html
+
+2017-6-2：
+	Linux(CentOS7) 下安装Redis指南 —— https://wenku.baidu.com/view/8cf6a65cfd0a79563d1e7219.html?from=search （注意命令空格）
+
+	Redis (error) NOAUTH Authentication required.解决方法：
+		例如密码是‘root’,当出现认证问题时候，输入“auth ‘root’”即可：127.0.0.1:6379> auth "root"
+		在CentOS/RHEL 6甚至更早版本系统上，iptables服务负责维护防火墙规则。
+		假设两台Redis服务器，ip分别为：192.168.1.101和192.168.1.103，如何在101上通过redis-cli访问103上的redis呢 [root@linuxidc001 ~]# redis-cli -h 192.168.1.103 -p 6379 
+
+		windows测试端口是否打开 telnet 192.168.xxx.xxx 6379
+		windows连接linux的redis工具 http://blog.csdn.net/fuck487/article/details/51889412

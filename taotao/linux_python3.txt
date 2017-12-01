@@ -1,0 +1,34 @@
+作者：Mingle Wong
+链接：https://www.zhihu.com/question/30279880/answer/179769995
+来源：知乎
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+
+操作环境：CentOS 7
+编译环境的安装：yum install zlib-devel bzip2-devel openssl-devel ncurese-devel（要先安装这个不然python安装不完整，会没有pip3)
+cd ~/
+下载wget https://www.python.org/ftp/python/3.5.2/Python-3.5.2.tgz 
+tar -xf Python-3.5.2.tgz
+cd ~/下载/Python-3.5.2
+设置安装目录：./configure --prefix=/usr/bin/python-3.5.2新建安装的文件夹：s
+udo mkdir /usr/bin/python-3.5.2
+编译命令 ：make（等待..)
+安装命令：sudo make install
+修改默认的python版本：sudo mv /usr/bin/python  /usr/bin/python.baksudo 
+ln -s /usr/bin/python-3.5.2/bin/python3.5 /usr/bin/python
+查看默认版本：python -V（如果是3.5.2，则修改完成）
+更改yum配置：sudo vi /usr/bin/yum（更改头部的python为python.bak）这样yum又可以使用
+python2 pip3使用前配置：ln -s /usr/bin/python-3.5.2/bin/pip3 /usr/bin/pip3
+输入pip3 list，查看是否可以运行
+pip3升级：pip3 install --upgrade pip
+
+
+
+===========================================分隔符========================
+
+yum -y install zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel readline-devel tk-devel gdbm-devel db4-devel libpcap-devel xz-devel   #确保pip的时候不会有出错
+
+make && make install
+
+ln -s /etc/python/python3.6/bin/python3.6 /usr/bin/python3
+
+ ln -s /etc/python/python3.6/bin/pip3.6 /usr/bin/pip3

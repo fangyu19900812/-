@@ -1,0 +1,12 @@
+
+describe - 描述
+increment - 增长
+primary - 首要的
+distinct - 区别的
+binary -[?ba?n?ri]- 二进制的
+RegExp - 正则表达式
+references -[?refr?ns]- 参考
+synchronized -['s??kr?na?zd]- 同步的
+async -[?'z??k]- 异步的
+schema - ski:m? - 概要
+catalog - k?t?l?:g - 目录

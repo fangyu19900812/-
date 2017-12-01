@@ -1,0 +1,144 @@
+hadoop1.0
+master:
+	1、路径 usr/local/src/
+	2、解压 hadoop
+	3、进入 hadoop解压后的文件夹 创建tmp文件夹，存放临时文件
+	4、进入 usr/local/src/hadoop-1.2.1/conf目录
+		修改master 
+			把localhost去掉加上masters
+		修改slaves
+			把localhost去掉加上slave1换行slave2……有多少个slave就加多少个
+		修改core-site.xml
+			<configuration>
+			//临时文件
+				<property>
+					<name>hadoop.tmp.dir</name>
+					<value>/usr/local/src/hadoop-1.2.1/tmp</value>
+				</property>
+			//namenode ip地址master ip地址
+				<property>
+					<name>fs.default.name</name>
+					<value>hdfs://192.168.183.10:9000</value> 
+				</property>
+			</configuration>
+		修改mapred-site.xml
+			<configuration>
+			//jobTracker 要http开头
+				<property>
+					<name>mapred.job.tracker</name>
+					<value>http://192.168.183.10:9001</value>
+				</property>
+			</configuration>
+		修改hdfs-site.xml
+			<configuration>
+			//配置hdfs副本数 默认3
+				<property>
+					<name>dfs.replication</name>
+					<value>3</value>
+				</property>
+			</configuration>
+		修改hadoop-env.sh
+			//jdk目录 http://www.cnblogs.com/kerrycode/archive/2015/08/27/4762921.html
+			// http://blog.csdn.net/cx118118/article/details/54955620
+			export JAVA_HOME= /usr/local/src/jdkxxx
+	5、进入 /etc目录		
+		修改hosts //配置hostname。访问可以用hostname不用ip
+			192.168.183.10 master
+			192.168.183.11 slave1
+			192.168.183.12 slave2
+		修改/sysconfig/network(永久生效)
+			HOSTNAME=localhost改成HOSTNAME=master
+		终端执行(只是临时生效、立即生效,重启失效)
+			# hostname	master
+			# hostname
+			master
+			
+	注意：每次重启后都需要关闭（也可以设置永久关闭。）
+		关闭防火墙
+			# /etc/init.d/iptables stop （也可以只打开要试用的端口）
+			或：[root@djt002 ~]# chkconfig iptables off //永久关闭防火墙
+				[root@djt002 ~]# service iptables stop     //临时关闭防火墙
+				[root@djt002 ~]# service iptables status //查看防火墙状态
+				iptables: Firewall is not running.
+
+		关闭selinux
+			# setenforce 0
+			# getenforce
+			Permissive //表示成功关闭
+	6、设置免密码远程登录ssh 没有的需要安装
+		# ssh-keygen
+		# cd ~/.ssh/
+		# cp id_rsa.pub authorized_keys
+		复制slave公钥 id_rsa.pub里面的内容到master的autorized_keys
+		所有的slave公钥复制完成后把master的autorized_keys复制到各个slave
+		# scp -rp authorized_keys slave1:~/.ssh/
+		//不需要密码就是设置成功
+		# ssh slave1 
+		# exit
+		//报错masters: ssh: Could not resolve hostname masters: Name or service not known
+		把/usr/local/src/hadoop-1.2.1/conf里面的master删除重新创建一个 如果是slave报错就删除重建slaves
+	7、启动集群
+		进入 usr/local/src/hadoop-1.2.1/bin目录
+		//第一次启动需要格式化
+		# ./hadoop namenode -format
+		# ./start-all.sh
+		# jps
+		111 NameNode
+		112 SecondaryNameNode
+		113 Jps
+		114 JobTracker
+		//测试是否能执行成功
+		# ./hadoop fs -ls /
+slave:
+	1-4 与master一样 把master的hadoop复制到slave 就不用重复执行 
+	终端执行 scp -rp hadoop-1.2.1 192.168.183.11:/usr/local/src/
+	//slave没有设置hostname只能用ip 否则可以scp -rp hadoop-1.2.1 slave1:/usr/local/src/
+
+	5、进入 /etc目录		
+		修改hosts //配置hostname。访问可以用hostname不用ip
+			192.168.183.10 master
+			192.168.183.11 slave1
+			192.168.183.12 slave2
+		修改/sysconfig/network(永久生效，重启生效、)
+			HOSTNAME=localhost改成HOSTNAME=slave1
+		终端执行(只是临时生效、立即生效,重启失效)
+			# hostname	slave1
+			# hostname
+			slave1
+		修改防火墙
+			# /etc/init.d/iptables stop
+		修改selinux
+			# setenforce 0
+			# getenforce
+			Permissive //表示成功关闭
+	6、设置远程登录不需要密码
+		# ssh-keygen
+		# cd ~/.ssh/
+		# cp id_rsa.pub authorized_keys
+		复制slave公钥 id_rsa.pub里面的内容到master的autorized_keys
+		所有的slave公钥复制完成后把master的autorized_keys复制到各个slave
+		//不需要密码就是设置成功
+		# ssh master 
+		# exit
+
+	7、启动集群
+		//master启动后
+		# jps
+		111 TaskTracker
+		112 Jps
+		113 DataNode
+		如果有问题，把master和slaver的tmp文件夹内容删除，执行master第七步
+
+
+
+
+
+
+
+
+
+
+
+
+
+	

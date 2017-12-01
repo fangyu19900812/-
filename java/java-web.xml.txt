@@ -1,0 +1,12 @@
+加载顺序 content-param -> listener -> filter -> servlet
+
+配置文件applicationContext.xml的加载 —— http://blog.csdn.net/xxxknight/article/details/46671355
+	
+Web.xml配置详解之context-param —— http://blog.csdn.net/jubincn/article/details/9115205
+
+<context-param>与<init-param>的区别与作用 —— http://www.cnblogs.com/hzj-/articles/1689836.html
+
+Spring中，applicationContext.xml 配置文件在web.xml中的配置详解 —— http://www.cnblogs.com/cczz_11/p/4363314.html
+
+2、http://www.cnblogs.com/pauler/p/4259775.html
+	http://blog.csdn.net/agileclipse/article/details/9014683

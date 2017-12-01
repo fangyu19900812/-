@@ -1,0 +1,66 @@
+
+// 1、把FastDFS提供的jar包添加到工程中
+// 2、初始化全局配置。加载一个配置文件。
+        ClientGlobal.init("D:\\workspaces-itcast\\JaveEE18\\taotao-manager\\taotao-manager-web\\src\\main\\resources\\properties\\client.conf");
+// 3、创建一个TrackerClient对象。
+        TrackerClient trackerClient = new TrackerClient();
+// 4、创建一个TrackerServer对象。
+        TrackerServer trackerServer = trackerClient.getConnection();
+// 5、声明一个StorageServer对象，null。
+        StorageServer storageServer = null;
+// 6、获得StorageClient对象。
+        StorageClient storageClient = new StorageClient(trackerServer, storageServer);
+// 7、直接调用StorageClient对象方法上传文件即可。
+        String[] strings = storageClient.upload_file("D:\\Documents\\Pictures\\images\\2f2eb938943d.jpg", "jpg", null);
+
+
+js跨域$.JSONP() 网址http://www.cnblogs.com/duanhuajian/p/3152617.html
+ $.ajax({
+             type: "get",
+             async: false,
+             url: "http://flightQuery.com/jsonp/flightResult.aspx?code=CA1998",
+             dataType: "jsonp",
+             jsonp: "callback",//传递给请求处理程序或页面的，用以获得jsonp回调函数名的参数名(一般默认为:callback)
+             jsonpCallback:"flightHandler",//自定义的jsonp回调函数名称，默认为jQuery自动生成的随机函数名，也可以写"?"，jQuery会自动为你处理数据
+             success: function(json){
+                 alert('您查询到航班信息：票价： ' + json.price + ' 元，余票： ' + json.tickets + ' 张。');
+             },
+             error: function(){
+                 alert('fail');
+             }
+         });
+$.getJSON("http://www.runoob.com/try/ajax/jsonp.php?jsoncallback=?", function(data) {。。。});
+1、后端返回数据的时候一定要加上回调  return callback + "(" + json格式数据字符串 + ");"
+   @RequestMapping("/test_jsonp")
+    public MappingJacksonValue test_jsonp(String callback) {
+        Object data = null; 
+        
+        return callback + "(" + JSONObject.fromObject(data) + ");";
+    }
+2、MappingJacksonValue 实现JSONP
+   @RequestMapping("/test_jsonp")
+    public MappingJacksonValue test_jsonp(String callback) {
+        Object data= null;
+        
+        MappingJacksonValue mappingJacksonValue = new MappingJacksonValue(data);
+        mappingJacksonValue.setJsonpFunction(callback) );
+        return mappingJacksonValue;
+    }
+
+httpclient http://blog.csdn.net/wangpeng047/article/details/19624529/   http://www.cnblogs.com/ITtangtang/p/3968093.html
+
+
+modelandview modelmap --把页面动态加载完后返回，可以用于seo 
+区别http://blog.csdn.net/qq_20282263/article/details/52831398  http://blog.csdn.net/top_code/article/details/51345822
+
+
+缓存Redis与Memcached的区别http://blog.csdn.net/tonysz126/article/details/8280696/
+
+
+全文检索 solr lucene 区别 http://blog.csdn.net/u010098331/article/details/51901272
+
+java使用Jedis连接redis服务器
+
+过滤器(Filter)和拦截器(Interceptor)的区别 http://blog.csdn.net/xiaodanjava/article/details/32125687   http://elim.iteye.com/blog/1750680
+
+中的setDomain 和 setPath的区别? http://blog.csdn.net/happyzwh/article/details/7767847

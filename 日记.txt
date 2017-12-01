@@ -1,0 +1,953 @@
+int long  float double char byte shot boolean 
+
+20160919：
+安装eclipse neno版，新建dynamic web project项目，在webcontent下创建index.jsp。 index.jsp第一行报错，原因，没有配置tomcat，解决办法：windows→preferences→server→runtime environments→add。项目没有导包，右键项目→properties→java build path→Libraries→Add Library→server runtime→next。项目从myeclipse和eclipse相互转移,需要改路径。svn的安装。
+==============================================
+20160920：
+http://www.cnblogs.com/xing901022/p/4352999.html查看运行项目index_jsp.java文件
+ 了解web.xml文件http://blog.csdn.net/believejava/article/details/43229361，http://www.xuebuyuan.com/415131.html
+jsp里的js的注释<!-- -->问题：在不支持js的浏览器 能识别<!---->里的，反之不能。
+==============================================
+20160921：
+jsp和serlvt的相关东西。jstl,filter, listen,javaBean
+==============================================
+20160922:  
+	mybatis:但是单个参数和多参数的判断有个不同点，当我们的入参为entity实体，或者map的时候，使用if 参数判断没任何问题。
+
+但是当我们的入参为java.lang.Integer 或者 java.lang.String的时候，这时候就需要注意一些事情了
+错误代码 ：<select id="getTrnsctListByLangId" parameterType="java.lang.Integer" resultType="java.lang.Integer">  
+   	 select   
+    	 trnsct_id  
+    	from  t_trnsct_way_l where   
+    	<if test="langId != null" >  
+       		and lang_id = #{langId}  
+    	</if>  
+  	</select> 
+正确代码 ：<select id="getTrnsctListByLangId" parameterType="java.lang.Integer" resultType="java.lang.Integer">  
+   	 select   
+    	 trnsct_id  
+    	from  t_trnsct_way_l where   
+    	<if test="_parameter != null" >  
+       		and lang_id = #{langId,jdbcType=INTEGER}  
+    	</if>  
+  	</select>
+这里就涉及到mybatis的内置对象_parameter，单个参数判断的时候，就不像1、 2那样直接用参数对象名判断了。还有就是数据类型最好加上 http://www.2cto.com/database/201409/338155.html
+======================================================
+2016093：
+怎样关掉firefox的密码自动填充功能？http://zhidao.baidu.com/link?url=XsVNd27tWKpXewJ3ewjdBttrxieF5Bb-rkqf4XUwjHAsyTj1IggTi03aUjSq72V6QCqAIdsgmy4_K9HD3j_Saq
+
+======================================================
+20160929：
+bean之间关系：
+继承：<bean id="01" class="01类" abstract="true" //表示抽象 >
+		<property name="" value=""></property>
+	</bean>
+	
+	<bean id="02" parent="01" > //继承 01
+		<property name="" value=""></property>
+	</bean>
+
+依赖：
+	<bean id="02" parent="01" depends-on="03">  //依赖03，先运行03
+		<property name="" value=""></property>
+	</bean>
+	<bean id="03" class="03类" >   
+	</bean>
+	
+引用：
+	<bean id="dog" class="dog.class" ></bean>
+	<bean id="02" parent="01" > 
+		<property name="dog" rel="dog"></property> //引用dog bean, 02继承的类也要有dog字段
+	</bean>
+
+bean作用范围：
+	<bean id="dog" class="dog.class" scope="xxx"></bean>
+	xxx:
+	    singleton --Spring ioc 容器中仅有一个bean实例。bean以单例存在。
+	    prototype --每次从容器中调用bean，都会返回一个新的实例。
+	    request --每次http请求都会创建一个新的bean。
+	    session --同一个http共享一个bean。
+	    global session --同一个全局session共享一个bean，一般用于portlet应用环境。
+	    application --同一个application共享一个bean。
+
+Aop:  	bean.xml记得在开头xsi引入http://.../aop 和 http://.../spring-aop.xsd 两个文件
+	
+	//student类
+	public class student{
+		public void addStudent(string name){
+			System.out.println("添加学生" + name);
+		}
+	}
+	
+	//aop
+	import org.aspectj.lang.JoinPoint;
+	public class aop{
+		//前置通知
+		public void doBefore(JoinPoint jp){
+			System.out.println("开始添加");
+		}
+		//后置通知
+		public void doAfter(JoinPoint jp){
+			System.out.println("结束添加");
+		}
+		//环绕通知
+		public Object doAround(ProceedingJoinPoint pjp) throws ...{
+			System.out.println("开始添加");
+			Object r = pjp.proceed();
+			System.out.println("结束添加");
+			return r;
+		}
+		//返回通知
+		public void doAfterReturning(JoinPoint jp){
+			System.out.println("返回通知");
+		}
+		//异常通知
+		public void doAfterThrowing(JoinPoint jp, Throwable ex){
+			System.out.println("异常通知");
+			System.out.println("异常信息"+ex.getMessage());
+		}
+	}
+	//bean.xml
+	<bean id="st" class="student" ></bean>
+	<bean id="aop1" class="aop" ></bean>
+	<aop:config>
+		<aop:aspect id="aop2" ref="aop1" >
+			//execution  第一个*表示返回任意值。  定义切点
+			//第二个*表示c下的所有文件
+			//第三个*表示c下的所有文件的所有方法
+			//2点表示方法任意参数
+			<aop:pointcut expression="execution(* a.b.c.*.*(..))" id="aop3" ></aop:pointcut>
+			//切面
+			<aop:before method="doBefore" pointcut-ref="aop3" />
+			<aop:after method="doAfter" pointcut-ref="aop3" />
+			<aop:around method="doAround" pointcut-ref="aop3" />
+			<aop:after-returning method="doAfterReturning" pointcut-ref="aop3" />
+			<aop:after-throwing method="doAfterThrowing" pointcut-ref="aop3" throwing="ex" /> 
+		</aop:aspect>
+	</aop:config>
+	//顺序--
+		//前置通知
+		//环绕通知-前
+		//异常通知
+		//返回通知
+		//环绕通知-后
+		//后置通知 
+
+======================================================
+20161010：
+js val() 与 value(): val需要jq插件 value是原生的
+
+
+======================================================
+20161011：
+spring4第9讲
+jdbc-jdbcTemplate:
+	application.xml文件 引入：
+       		xmlns:context="http://www.springframework.org/schema/context"
+       		xsi:schemaLocation=http://www.springframework.org/schema/context
+      				   http://www.springframework.org/schema/context/spring-context.xsd
+		
+		//有阿帕奇的连接池，这里用阿里巴巴的连接池class
+		<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" destroy-method="close"> 
+			<!-- 数据源URL -->
+        		<property name="url" value="${url}"/>
+        		<!-- 数据库用户名 -->
+        		<property name="username" value="${db.username}"/>
+        		<!-- 数据库密码 -->
+        		<property name="password" value="${db.password}"/>
+        		<!-- 数据库驱动 -->
+        		<property name="driverClassName" value="${driverClassName}"/>
+		</bean>
+
+		//设置项目中可以获取到的properties配置文件 dataSource的value就在这里设置
+    		<context:property-placeholder location="classpath*:/config/*.properties"/>
+
+
+	*.properties文件：
+		jdbc.driverClassName = com.mysql.jdbc.Driver	//数据库驱动，需要加mysql-connector-java.jar包
+		jdbc.url = jdbc:mysql://locahost:3306/db_xxx    //要连接的数据库
+		jdbc.unserName = root				//数据库帐号
+		jsbc.password = 123456				//数据库密码
+
+
+	application.xml文件:
+		//导入spring-jdbc-xxxrelease.jar  spring-tx-xxxrelease.jar
+		<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+			<property name="dataSource" ref="dataSource"/>
+		</bean>
+
+		//StudentDao实现类StudentDaoImpl要有jdbcTemplate参数 set方法
+		<bean id="stuDaoImpl" class="com.dao.impl.StudentDaoImpl"> 
+			<property name="jdbcTemplate" ref="jdbcTemplate"/>
+		</bean>
+
+		//StudentService实现类StudentServiceImpl要有studentDao参数 set方法
+		<bean id="stuServiceImpl" class="com.service.impl.StudentServiceImpl"> 
+			<property name="studentDao" ref="studentDao"/>
+		</bean>
+		
+	StudentDaoImpl文件：
+
+		private JdbcTemplate jdbcTemplate
+		
+		public void setJdbcTemplate(JdbcTemplate jdbcTemplate){
+			this.jdbcTemplate = jdbcTemplate;
+		}
+
+		public int addStu(Student s){
+			String sql = "insert into st values(null,?,?)";
+			Object[] params = new Object[]{s.getName(),s.getAge()};
+			return jdbcTemplate.update(sql,params)                  //update是JdbcTemplate 封装好的
+		}
+
+
+======================================================
+20161012：
+mybatis:  新增的时候values写成value;导致调试了半天。
+
+spring4第十讲：
+	jdbcDaoSupport;
+	NameParamerterJdbcTemplate 支持命名参数变量 //sql语句例：String sql = " insert into t value(:name, :age)";
+
+spring4第十一讲：
+	事务：
+		编程式事务管理：（已经侵入业务逻辑）
+			application.xml文件:
+				<!--jdbc事务管理器-->
+				<bean id="trasactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager"> 
+					<property name="dataSource" ref="dataSource"/>
+				</bean>
+				<!--jdbc事务管理器模版-->
+				<bean id="trasactionTemplate" class="org.springframework.transaction.support.TransactionTemplate"> 
+					<property name="trasactionManager" ref="trasactionManager"/>
+				</bean>
+
+				<bean id="bankService" class="xxxx.impl.BankServiceImpl"> 
+					<property name="bankDao" ref="bankDao"/>
+					<property name="t" ref="trasactionTemplate"/>
+				</bean>
+
+			BankServiceImpl.java //事务实现
+				public class BankServiceImpl implements BankService{
+					private BankDao bankDao;
+					public void setBankDao(BankDao bankDao){ this.bankDao=bankDao;}
+
+					private TransactionTemplate t;
+					public void setTransactionTemplate(TransactionTemplate t){ this.t=t;}
+				
+					@Override
+					public void transferAccounts(final int money, final int id_a, final int id_b){ //内部类需要加final
+						t.execute(new TransactionCallBackWithoutTesult(
+							@Override
+							protected void doInTransactionWithoutResult(TransactionStatus status)){
+								bankDao.outMoney(money,id_a, id_b);
+								bankDao.inMoney(money,id_a, id_b); 
+							}
+						));
+					}
+
+				
+				}
+				
+				
+			
+
+spring4第十二讲
+	事务：
+		声明式事务管理：
+
+		  1、xml配置声明方式
+			application.xml文件 引入：
+       				xmlns:tx="http://www.springframework.org/schema/tx"
+       				xsi:schemaLocation=http://www.springframework.org/schema/tx
+      				   	http://www.springframework.org/schema/rx/spring-tx.xsd
+				
+				<!--配置事务通知-->	
+				<tx:advice id="txAdvice" trasaction-manager="trasactionManager">  //trasactionManager是十一讲的jdbc事务管理器id
+					<tx:attributes>
+						<tx:mathod  name="*" />  //所有的方法
+					</tx:attributes>
+				</tx:advice>
+
+				<!--配置事务切面-->
+				<aop:config>  
+					<!--配置事务切点-->
+					<aop:pointcut id="serviceMethod" expression="execution(* a.b.c.*.*(..))" id="aop3" ></aop:pointcut>
+					<!--配置事务通知-->
+					<aop:advisor advice-ref="txAdvice" pointcut-ref="serviceMethod" /> 
+				</aop:config>
+
+		  2、注解配置声明方式
+			<tx:annotation-driven trasaction-manager="trasactionManager" /> //trasactionManager是十一讲的jdbc事务管理器id
+
+			然后在需要事务的方法上面加上@Trasactional
+
+
+		事务传播行为：
+			当一个service调用另一个的时候,因为每个service都有事务，这时候就出现事务嵌套，就产生事务传播行为
+
+			REQUIRED		--支持当前事务，如果当前没有事务，就新建一个事务。最常见的选择。
+ 
+			SUPPORTS		--支持当前事务，如果当前没有事务，就非事务方式执行。
+
+			MANDATORY		--支持当前事务，如果当前没有事务，就抛出异常
+
+			REQURES_NEW		--新建事务，如果当前存在事务，就把当前事务挂起
+
+			NOT_SUPPORTED	--以非事务的方式操作，如果当前存在事务，就把当前事务挂起
+
+			PROPAGATION_NEVER		--以非事务的方式操作，如果当前存在事务，就抛出异常
+			<!--配置事务通知-->	
+			<tx:advice id="txAdvice" trasaction-manager="trasactionManager">  //trasactionManager是十一讲的jdbc事务管理器id
+				<tx:attributes>
+					<tx:mathod  name="insert*" propagetion="REQUIRED"/>  //insert开头的方法
+					<tx:mathod  name="get*" propagetion="REQUIRED" read-only="true"/>  //get开头的方法 不需要编辑数据就只读
+				</tx:attributes>
+			</tx:advice> 
+
+=====================================================================
+20161017：
+	
+	==========================重要===================================
+	今天发现2个bug, 一个是datasource.properties文件的jsbc.driverClassName的最后有一个空格
+			另一个是mapping.xml的resultType值写错写成resultMap的值
+	==========================重要===================================
+	
+	数据库：like：
+		mysql: PlatformUserNo like "%"#{platformUserNo,jdbcType=VARCHAR}"%"
+		oracle: cc.cc_num like '%'||#{queryObject.cc_num}||'%'
+
+====================================================================
+20161018：
+	spring mvc中的@PathVariable是用来获得请求url中的动态参数的，十分方便
+	
+	html弹窗打印：
+		弹窗top.Dialog.open() 里面有打印按钮，需要打印弹窗里的内容。但是无论是window.print还是jq打印插件都无法打印。jq也无法使用。
+		发现window.xx会调用父窗口的方法。最后只能用子窗口回调函数调用父窗口的方法。并把需要打印的内容传回去。
+		如:
+			子窗口 print(){ window.printDiv(div.html());}
+			父窗口 printDiv(htmls){ 
+					$("#printDiv").html(htmls); //printDiv需要打印的div
+					$("#printDiv").jqprint(); //jq打印插件
+					$("#printDiv").html("");
+				}
+			
+====================================================================
+20161019：
+	js 表单重置验证：
+		1、$('#xx')[0].reset() 			// $('#xx').reset()无法找到reset()
+		2、$("#xx").resetForm(); 		//没效果
+		3、<input type="reset" value="重置" />  //这个会把下拉框里的文字清空
+		4、直接写个方法把表单的所有元素都置空。 //比较麻烦 
+
+spring4第十三讲：整合Hibernate,struts2
+
+	web.xml文件:
+		<!-- 添加对spring的支持 -->
+		<context-param>
+        		<param-name>contextConfigLocation</param-name>
+        		<param-value>classpath:applicationContext.xml</param-value>
+    		</context-param>
+
+    		<!-- 定义Spring容器的监听器 加载spring-->
+    		<listener>
+        		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    		</listener>
+
+    		<!-- 添加struts2支持-->
+    		<filter>
+			<filter-name>struts2</filter-name>
+			<filter-class>org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter</filter-class> 
+		</filter>
+  		<filter-mapping>
+			<filter-name>struts2</filter-name>
+			<url-pattern>/*</url-pattern>
+		</filter-mapping>
+		
+		<!--session延迟加载到页面-->
+		<filter>
+     			<filter-name>OpenSessionInViewFilter</filter-name>
+     			<filter-class>org.springframework.orm.hibernate4.support.OpenSessionInViewFilter</filter-class>
+			//singleSession默认为true,若设为false则等于没用OpenSessionInView
+       			<init-param>
+            			<param-name>singleSession</param-name>
+            			<param-value>true</param-value>
+        		</init-param>
+		</filter>
+ 		<filter-mapping>
+     			<filter-name>OpenSessionInViewFilter</filter-name>
+     			<url-pattern>*.action</url-pattern>    //struts2请求用action
+ 		</filter-mapping>
+
+
+
+			
+====================================================================
+20161024：
+	ie11打印字体太大，打开浏览器后，在最上面的菜单栏里，点击“查看”→“文字大小”
+
+====================================================================
+20161025：
+	spring4 web.xml配置
+		<?xml version="1.0" encoding="UTF-8"?>
+		<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+			xmlns="http://java.sun.com/xml/ns/javaee"
+			xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+			id="WebApp_ID" version="3.0">
+
+			<!-- Spring配置 -->
+			<listener>
+				<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+			</listener>
+
+			<!-- 指定Spring Bean的配置文件所在目录。默认配置在WEB-INF目录下 -->
+			<context-param>
+				<param-name>contextConfigLocation</param-name>
+				<param-value>WEB-INF/applicationContext.xml</param-value>
+			</context-param>
+
+			<welcome-file-list>
+				<welcome-file>index.jsp</welcome-file>
+			</welcome-file-list>
+
+		</web-app>
+
+	springMVC web.xml配置 
+		<?xml version="1.0" encoding="UTF-8"?>
+		<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    			xmlns="http://java.sun.com/xml/ns/javaee"
+    			xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+    			id="WebApp_ID" version="3.0">
+    			<display-name>springmvctest</display-name>
+    			<!-- 统一编码 -->
+    			<filter>
+        			<filter-name>charsetEncoding</filter-name>
+        			<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+        			<init-param>
+            				<param-name>encoding</param-name>
+            				<param-value>UTF-8</param-value>
+        			</init-param>
+        			<init-param>
+            				<param-name>forceEncoding</param-name>
+            				<param-value>true</param-value>
+        			</init-param>
+    			</filter>
+    			<filter-mapping>
+        			<filter-name>charsetEncoding</filter-name>
+        			<url-pattern>/*</url-pattern>
+    			</filter-mapping>
+    			<!-- 前端控制器 -->
+    			<servlet>
+        			<servlet-name>springmvc</servlet-name>
+        			<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        			<!-- 加载/WEB-INF/[servlet-name]-servlet.xml -->
+				<!-- 如果不写这个init标签及其内容，默认就会去/WEB-INF/servlet-context.xml 下面去寻找这个文件，那么SpringMVC的相关配置就要写在与<servlet-name>中的内容一致的xml里 默认就会去/WEB-INF/servlet-context.xml 下面去寻找这个文件 -->
+				<init-param>
+            				<param-name>contextConfigLocation</param-name>
+            				<!-- 这里是配置文件的路径 -->
+            				<param-value>classpath*:/applicationContext.xml</param-value>
+        			</init-param>
+        			<load-on-startup>1</load-on-startup>
+    			</servlet>
+    			<servlet-mapping>
+        			<servlet-name>springmvc</servlet-name>
+        			<url-pattern>/</url-pattern>
+    			</servlet-mapping>
+		</web-app>
+ 
+====================================================================
+20161027：
+	springmvc中@PathVariable和@RequestParam的区别：
+		http://localhost:8080/Springmvc/user/page.do?pageSize=3&pageNow=2 
+		http://localhost:8080/Springmvc/user/page.do 这个就是请求路径，是你的请求url，而如果这个路径上有数据匹配，用的就是@PathVariable  如 
+		@RequestMapping(value="/page{pageNo}.do") 
+		public String page(@PathVariable int pageNo){} 
+		
+		而问号的后面部分就是请求参数部分，是要向请求路径提交的参数信息，用的就是@RequestParam ，对于这种参数，如果你要用的话，代码应该如下： 
+		@RequestMapping(value="/page.do") 
+		public String page(@RequestParam int pageSize,@RequestParam  int pageNow){} 
+
+		其实你只要把什么叫请求路径，什么叫请求参数分清楚，也就能理解@PathVariable和@RequestParam 
+
+		http://www.iteye.com/problems/101566 这个如果对应sprimgmvc里面，想获取问题编号101566，因为这个地址直接就是请求路径，是一个url，所以代码中用		的应该是@PathVariable，如下： 
+		@RequestMapping(value="/problems/{problemId}") 
+		public String showProblem(@PathVariable int problemId){}
+
+====================================================================
+20161028：
+	jsp: ${xx} 假如xx存在特殊字符，比如<、>。html会解析所以会报错. 用${fn:replace(xx, "<", "&lt;")}
+
+====================================================================
+20161031：
+	ie hack
+====================================================================
+20161102： 
+	mysql第一讲第二讲
+====================================================================
+20161109：
+	mybatis的批量新增、修改、删除
+
+	mapping 文件
+		<!-- 批量新增 -->
+  		<insert id="batchSave" parameterType="java.util.List" >
+    		INSERT INTO xx表 
+	    		(x字段,xx字段)
+    		VALUES 
+    			<foreach collection="list" item="item" index="index" separator="," >
+		    		(#{ item.x值,jdbcType=VARCHAR}, #{ item.xx值,jdbcType=VARCHAR})
+			</foreach>
+  		</insert> 
+
+		<!-- 批量修改没写等写的时候补上 -->
+
+  		<!-- 批量删除 只能一个字段-->
+  		<delete id="batchDeleteUser" parameterType="java.util.List" >
+   			DELETE FROM xx表 WHERE id IN
+   			<foreach collection="list" item = "id" open="(" separator="," close=")">
+   				#{id,jdbcType=INTEGER}
+    			</foreach> 
+  		</delete>  
+
+		<!-- 批量删除 可多选择不同字段 -->
+  		<!-- 删除ID、 User_ID其中一个-->
+  		<delete id="batchDelete" parameterType="map" >
+   			DELETE FROM xx表 
+   			<where>
+   				<if test="id != null and id != ''"> 
+		   			ID in
+		   			<foreach collection="id" item = "id" open="(" separator="," close=")">
+		   				#{id,jdbcType=INTEGER}
+		    			</foreach> 
+   				</if>
+   				<if test="userId != null and userId !=''"> 
+		   			or User_ID in
+		   			<foreach collection="userId" item = "userId" open="(" separator="," close=")">
+		   				#{userId,jdbcType=INTEGER}
+		    			</foreach> 
+   				</if> 
+    			</where>
+  		</delete> 
+
+	serviceImpl文件
+		public void save() { 
+			List<xx实体类> list = new ArrayList<xx实体类>();
+			for(循环){
+				xx实体类 x = new xx实体类();
+				x.setYY(yy);
+				...
+				...
+				list.add(x);
+			}
+			xxDao.batchSave(list);
+		}
+
+		public void delete(){ 
+        		Map<String,Object> m = new HashMap<String,Object>(); 
+			List<Object> list = new ArrayList<Object>();
+			List<Object> umlist = new ArrayList<Object>();
+			for (循环) { 
+				list.add(idxxx);
+				umlist.add(userIdxxx);
+			}	
+			m.put("id", list);
+			m.put("userId", umlist);	 
+			xxDao.batchDelete(m);
+		}
+
+		public void deleteUser(String ids){ 
+        		Map<String,Object> m = new HashMap<String,Object>(); 
+			List<Object> list = new ArrayList<Object>();
+			String[] str = ids.split(","); 
+			for (int i = 0; i < str.length; i++) { 
+				list.add(Integer.valueOf(str[i]));
+			}	 	 
+			xxDao.batchDeleteUser(list);
+		}
+
+
+
+
+
+====================================================================
+20170108：
+
+	mybatis：查询另一张表批量新增
+	//当搜索的train_flow_job_answer表为空时，会插入数据，但is_right为null
+	<insert id="batchInsertStudentAnswer" parameterType="java.util.List">
+  		INSERT INTO train_student_answer 
+  			(train_id, group_id, flow_job_form_id, item_id, form_id, answer_text,  stamp_id, subject_tree_id,
+  			is_count_points, creater_id, creater_name,creater_date, updater_id,updater_name,updater_date,is_right)
+    		<foreach collection="list" item="item" index="index" separator="UNION ALL" >
+    			SELECT 
+    				#{item.trainId,jdbcType=INTEGER} as train_id, ……,
+				    (SELECT CASE WHEN a.answer_text = #{item.answerText,jdbcType=VARCHAR} THEN 1 ELSE 0 END is_right //is_right是列名
+				FROM train_flow_job_answer as a
+				WHERE a.flow_job_form_id = #{item.flowJobFormId,jdbcType=INTEGER}
+						AND a.train_id = #{item.trainId,jdbcType=INTEGER}
+						AND a.item_id = #{item.itemId,jdbcType=VARCHAR})
+    		</foreach>
+  	</insert>
+	//当搜索的train_flow_job_answer表为空时，不会插入数据
+	<insert id="batchInsertStudentAnswer" parameterType="java.util.List">
+  		INSERT INTO train_student_answer 
+  			(train_id, group_id, flow_job_form_id, item_id, form_id, answer_text,  stamp_id, subject_tree_id,
+  			is_count_points, creater_id, creater_name,creater_date, updater_id,updater_name,updater_date,is_right)
+    		<foreach collection="list" item="item" index="index" separator="UNION ALL" >
+    			SELECT 
+    				#{item.trainId,jdbcType=INTEGER} as train_id, ……,
+				CASE WHEN a.answer_text = #{item.answerText,jdbcType=VARCHAR} THEN 1 ELSE 0 END is_right //is_right是列名
+				FROM train_flow_job_answer as a
+				WHERE a.flow_job_form_id = #{item.flowJobFormId,jdbcType=INTEGER}
+						AND a.train_id = #{item.trainId,jdbcType=INTEGER}
+						AND a.item_id = #{item.itemId,jdbcType=VARCHAR}
+    		</foreach>
+  	</insert>
+
+====================================================================
+20170310：点击事件需要加上多次点击管控，避免插入重复数据
+
+	maven項目:
+		創建maven項目:http://blog.csdn.net/enson16855/article/details/19702477
+		如果pom.xml報錯:Cannot detect Web Project version. Please specify version of Web Project through...
+		參考:http://www.cnblogs.com/TerrySunShine/p/5810472.html 然後 右鍵項目 maven4myeclipse --> update project
+		注意setting.xml的设置:window--prefernces--maven4myeclipse--usersettring
+		注意环境变量M2_HOME
+
+====================================================================
+20170314： 
+	java反射：
+		Class<?> class1 = null;
+        	Class<?> class2 = null;
+       	 	Class<?> class3 = null;
+        	// 一般采用这种形式
+        	class1 = Class.forName("net.xsoftlab.baike.TestReflect");
+        	class2 = new TestReflect().getClass();
+        	class3 = TestReflect.class;
+        	System.out.println("类名称   " + class1.getName());
+        	System.out.println("类名称   " + class2.getName());
+        	System.out.println("类名称   " + class3.getName());
+
+====================================================================
+20170315：
+	array、arrays、arrayList、LinkedList：
+
+		array：数组列表、固定长度、效率高
+			String[] aArray = new String[5];  
+			String[] bArray = {"a","b","c", "d", "e"};  
+			String[] cArray = new String[]{"a","b","c","d","e"}; 
+		arrays：工具类 
+			Arrays.asList(stringArray).contains("a"); 数组是否包含某个值 
+		arrayList：数组、可变长度、效率低、基于动态数组的数据结构
+
+		LinkedList：基于链表的数据结构。当你的操作是在一列数据的前面或中间添加或删除数据，并且按照顺序访问其中的元素时，就应该使用LinkedList了
+
+		ArrayList：异步处理，新的类，只能用 Iterator输出。当你的操作是在一列数据的后面添加数据而不是在前面或中间,并且需要随机地访问其中的元素时,使用ArrayList会提供比较好的性能。List<String> list=Collections.synchronizedList(new ArrayList<String>());
+
+		Vector：同步处理，旧的类，能用 Iterator和 Enumeration 同时输出
+		
+
+====================================================================
+20170317：
+	HashSet：哈希表是通过使用称为散列法的机制来存储信息的，元素并没有以某种特定顺序来存放；  
+	LinkedHashSet：以元素插入的顺序来维护集合的链接表，允许以插入的顺序在集合中迭代；  
+	TreeSet：提供一个使用树结构存储Set接口的实现，对象以升序顺序存储，访问和遍历的时间很快。  
+
+	HashSet<String> hs = new HashSet<String>();  
+        hs.add("B");  
+        hs.add("A");  
+        hs.add("D");  
+        hs.add("E");  
+        hs.add("C");  
+        hs.add("F");  
+        System.out.println("HashSet 顺序:\n"+hs);  
+          
+        LinkedHashSet<String> lhs = new LinkedHashSet<String>();  
+        lhs.add("B");  
+        lhs.add("A");  
+        lhs.add("D");  
+        lhs.add("E");  
+        lhs.add("C");  
+        lhs.add("F");  
+        System.out.println("LinkedHashSet 顺序:\n"+lhs);  
+          
+        TreeSet<String> ts = new TreeSet<String>();  
+        ts.add("B");  
+        ts.add("A");  
+        ts.add("D");  
+        ts.add("E");  
+        ts.add("C");  
+        ts.add("F");  
+        System.out.println("TreeSet 顺序:\n"+ts);  
+
+ 	HashSet 顺序:
+	[D, E, F, A, B, C]
+ 	LinkedHashSet 顺序:
+	[B, A, D, E, C, F]
+	TreeSet 顺序:
+	[A, B, C, D, E, F]
+
+	---------------------------------------------
+
+	map:HashMap Hashtable LinkedHashMap 和TreeMap
+
+	HashMap里面存入的键值对在取出的时候是随机的,也是我们最常用的一个Map.它根据键的HashCode值存储数据,根据键可以直接获取它的值，具有很快的访问速度。在Map 中插入、删除和定位元素，HashMap 是最好的选择。  
+	TreeMap取出来的是排序后的键值对。但如果您要按自然顺序或自定义顺序遍历键，那么TreeMap会更好。  
+	LinkedHashMap 是HashMap的一个子类，如果需要输出的顺序和输入的相同,那么用LinkedHashMap可以实现.  (应用场景：购物车等需要顺序的)
+        	map.put("1", "Level 1");      
+        	map.put("a", "Level a");      
+        	map.put("2", "Level 2");     
+        	map.put("b", "Level b");      
+        	map.put("3", "Level 3");       
+        	map.put("c", "Level c"); 
+    		Iterator it = map.entrySet().iterator(); 
+		while ( it.hasNext()) {  
+    			Map.Entry e = (Map.Entry) it.next();  
+    			System.out.println("Key: " + e.getKey() + ";   Value: "    + e.getValue());  
+   		}  		
+		------HashMap无序（随机输出）------  
+		Key: 3;   Value: Level 3  
+		Key: 2;   Value: Level 2  
+		Key: 1;   Value: Level 1  
+		Key: b;   Value: Level b  
+		Key: c;   Value: Level c  
+		Key: a;   Value: Level a  
+		------TreeMap有序（但是按自动排序输出，不能指定）------  
+		Key: 1;   Value: Level 1  
+		Key: 2;   Value: Level 2  
+		Key: 3;   Value: Level 3  
+		Key: a;   Value: Level a  
+		Key: b;   Value: Level b  
+		Key: c;   Value: Level c  
+		------LinkedHashMap 有序（根据输入的顺序输出）------  
+		Key: 1;   Value: Level 1  
+		Key: a;   Value: Level a  
+		Key: 2;   Value: Level 2  
+		Key: b;   Value: Level b  
+		Key: 3;   Value: Level 3  
+		Key: c;   Value: Level c  
+
+	Hashtable：不同的是:它不允许记录的键或者值为空;它支持线程的同步，即任一时刻只有一个线程能写Hashtable,因此也导致了 Hashtable在写入时会比较慢。
+	HashMap: 最多只允许一条记录的键为Null;允 许多条记录的值为 Null;不支持线程的同步，即任一时刻可以有多个线程同时写HashMap;可能会导致数据的不一致,需要同步，可以用 				Collections的synchronizedMap方法使HashMap具有同步的能力，或者使用ConcurrentHashMap。Map m = Collections.synchronizeMap(hashMap);
+ 
+====================================================================
+20170330：
+	java文件读写：
+		File f = new File("C://fy.txt");
+		try {
+			FileOutputStream fop = new FileOutputStream(f);
+			
+			OutputStreamWriter writer = new OutputStreamWriter(fop, "UTF-8");
+			writer.append("中文输入");// 写入到缓冲区		    
+		    	writer.append("\r\n");//换行		    
+		    	writer.append("English");// 刷新缓存冲,写入到文件,如果下面已经没有写入的内容了,直接close也会写入		    
+		    	writer.close();//关闭写入流,同时会把缓冲区内容写入文件,所以上面的注释掉		    
+		    	fop.close();
+		    
+		    	FileInputStream fip = new FileInputStream(f); // 构建FileInputStream对象		    
+		    	InputStreamReader reader = new InputStreamReader(fip, "UTF-8");// 构建InputStreamReader对象,编码与写入相同		 
+		    	StringBuffer sb = new StringBuffer();
+		    	while (reader.ready()) {
+		      		sb.append((char) reader.read());// 转成char加到StringBuffer对象中
+		    	}
+		    	System.out.println(sb.toString());
+		    	reader.close();// 关闭读取流		    
+		    	fip.close();
+
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	---------------------------------------------
+
+	String、StringBuffer与StringBuilder之间区别
+
+		三者在执行速度方面的比较：StringBuilder >  StringBuffer  >  String
+
+		StringBuilder：线程非安全的
+
+　　　　	StringBuffer：线程安全的
+
+====================================================================
+20170406：
+	thread runnable区别：
+		1、继承 Thread 类 。
+		2、实现 Runnable 接口 
+		3、在程序开发中只要是多线程肯定永远以实现Runnable接口为主，因为实现Runnable接口相比继承Thread类有如下好处：
+			1.避免点继承的局限，一个类可以继承多个接口。
+			2.适合于资源的共享
+
+		以卖票程序为例，通过Thread类完成：	
+			package org.demo.dff;  
+			class MyThread extends Thread{  
+				private int ticket=10;  
+				public void run(){  
+					for(int i=0;i<20;i++){  
+						if(this.ticket>0){  
+							System.out.println("卖票：ticket"+this.ticket--);  
+						}  
+					}  
+				}  
+			};
+
+		下面通过三个线程对象，同时卖票：
+			package org.demo.dff;  
+			public class ThreadTicket {  
+				public static void main(String[] args) {  
+					MyThread mt1=new MyThread();  
+					MyThread mt2=new MyThread();  
+					MyThread mt3=new MyThread();  
+					mt1.start();//每个线程都各卖了10张，共卖了30张票  
+					mt2.start();//但实际只有10张票，每个线程都卖自己的票  
+					mt3.start();//没有达到资源共享  
+				}  
+			} 
+
+		如果用Runnable就可以实现资源共享，下面看例子：
+			package org.demo.runnable;  
+			class MyThread implements Runnable{  
+				private int ticket=10;  
+				public void run(){  
+					for(int i=0;i<20;i++){  
+						if(this.ticket>0){  
+							System.out.println("卖票：ticket"+this.ticket--);  
+						}  
+					}  
+				}  
+			}  
+			package org.demo.runnable;  
+			public class RunnableTicket {  
+				public static void main(String[] args) {  
+					MyThread mt=new MyThread();  
+					new Thread(mt).start();//同一个mt，但是在Thread中就不可以，如果用同一  
+					new Thread(mt).start();//个实例化对象mt，就会出现异常  
+					new Thread(mt).start();  
+				}  
+			}; 
+
+		虽然现在程序中有三个线程，但是一共卖了10张票，也就是说使用Runnable实现多线程可以达到资源共享目的。
+
+		Runnable接口和Thread之间的联系：发现Thread类也是Runnable接口的子类。
+
+
+====================================================================
+20170505：
+	java String 中 intern方法的概念——https://zhidao.baidu.com/question/227547249.html?fr=iks&word=intern&ie=gbk
+
+	---------------------------------------------
+
+	JVM 内存初学 (堆(heap)、栈(stack)和方法区(method) )——http://www.open-open.com/lib/view/open1432200119489.html
+
+	---------------------------------------------
+
+	Java 集合系列目录(Category)——http://www.cnblogs.com/skywang12345/p/3323085.html
+
+	---------------------------------------------
+
+	单链表反转（递归和非递归） (Java)
+
+		class ListNode {
+    			int val;
+    			ListNode next;
+
+    			ListNode(int x) {
+        			val = x;
+    			}
+		}
+
+		非递归实现很简单，只需要遍历一遍链表，在遍历过程中，把遍历的节点一次插入到头部。
+		public ListNode reverseList(ListNode head) {
+        		ListNode prev = null;
+        		while(head!=null){
+            			ListNode tmp = head.next;
+           	 		head.next = prev;
+            			prev = head;
+            			head = tmp;
+        		}
+       			 return prev;
+    			}
+		
+		递归实现：翻转head->为首的链表， 然后head变为尾部节点
+		public ListNode reverseList(ListNode head) {
+        		if(head==null||head.next ==null){
+            			return head;
+			}
+       			ListNode prev = reverseList(head.next);
+        		head.next.next = head;
+        		head.next = null;
+        		return prev;
+    		}
+
+====================================================================
+20170605：
+	消息队列Java的简单实现 —— http://blog.csdn.net/u012260707/article/details/50476475
+	如何使用Jedis操作Redis消息队列 —— http://www.cnblogs.com/xing901022/p/4867679.html
+
+
+====================================================================
+20170606：
+	Java对象序列化
+	public class Person implements Serializable { 
+		……
+	}
+	public class SimpleSerial {  
+ 
+    		public static void main(String[] args) throws Exception {  
+        		File file = new File("person.out");  
+ 			//写
+        		ObjectOutputStream oout = new ObjectOutputStream(new FileOutputStream(file));  
+        		Person person = new Person("John", 101, Gender.MALE);  
+        		oout.writeObject(person);  
+        		oout.close();  
+ 
+			//读
+        		ObjectInputStream oin = new ObjectInputStream(new FileInputStream(file));  
+        		Object newPerson = (Person)oin.readObject();
+        		oin.close();  
+        		System.out.println(newPerson);  
+    		}  
+	} 
+
+====================================================================
+20170612：
+	 spring配置文件头部配置解析（applicationContext.xml）—— http://blog.csdn.net/li575563191/article/details/54235948
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

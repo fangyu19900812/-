@@ -1,0 +1,182 @@
+=================================== js ===============================
+
+-----------------------------------------
+//延时加载外部js
+<script type="text/javascript">
+function downloadJSAtOnload() {
+var element = document.createElement("script");
+element.src = "defer.js";
+document.body.appendChild(element);
+}
+if (window.addEventListener)
+window.addEventListener("load", downloadJSAtOnload, false);
+else if (window.attachEvent)
+window.attachEvent("onload", downloadJSAtOnload);
+else window.onload = downloadJSAtOnload;
+</script>
+-----------------------------------------
+
+window.onload = （）必须等到页面内包括图片的所有元素加载完毕后才能执行。 
+$(document) 是DOM结构所有元素。
+$(document).ready()是DOM结构绘制完毕后就执行，不必等到加载完毕。 
+-----------------------------------------
+
+//跳出each循环
+return false;
+-----------------------------------------
+
+currentObj = null;
+currentObj["a"] = "A"; 是错的
+currentObj = new Object();
+currentObj["a"] = "A";	是对的
+-----------------------------------------
+
+//jq属性选择器 选择多个属性
+E[attr=val][attr=val]
+$("div[title='ttt'][class='aaaa']")
+-----------------------------------------
+
+//object长度
+Object.keys(obj).length
+-----------------------------------------
+
+//array新增
+var a = [];
+a.push("a");
+-----------------------------------------
+
+//ajax参数含有object
+c={"c":"cc"}
+data:{"a":"a","b":JSON.stringify(c)) 需要JSON.stringify
+JSON.stringify(), 将value(Object,Array,String,Number...)序列化为JSON字符串
+JSON.parse(),　将JSON数据解析为js原生值
+-----------------------------------------
+
+get请求的url带参数,post请求的url不带参数.post请求是不会被缓存的
+
+-----------------------------------------
+
+toFixed() 返回的是字符串
+
+-----------------------------------------
+
+当form表单中只有一个<input type="text" name="name" />时按回车键将会自动将表单提交。所以必须添一个隐藏input 设置type="hidden"会无效 可以设置style="display:none" 
+
+-----------------------------------------
+
+火狐 a标签下载提交2次请求
+1#<a  href="download.html?fileName=QQ截图20140611195550.png">下载</a>  
+2#<a onclick="location.href='download.html?fileName=QQ截图20140611195550.png'" href="#">下载</a>  
+3#<a  href="download.html">下载</a> 
+火狐浏览器用1#网络显示提交一次，但后台会执行两次，而且若是提交到servlet则后台会出现Cannot forward after response has been committed错误，ie浏览器正常；改为2#两种浏览器正常；3#url后无参数，此时两种浏览器提交，后台都只执行一次。
+个人觉得后台执行执行一次才正常，应该是火狐浏览器的问题。
+今天逐个组件禁用测试，原来是Thunder Extension 的组件导致的，禁用后只提交一次。
+
+-----------------------------------------
+
+=================================== jq ===============================
+
+-----------------------------------------
+jQuery判断checkbox是否选中的3种方法，网上大多数文章都提供的方法都是无效的，建议使用方法二
+方法一：
+if ($("#checkbox-id").get(0).checked) {
+    // do something
+}
+方法二：
+if($("#checkbox-id").is(":checked")) {
+    // do something
+}
+方法三：(好像没用。jq1.8）
+if ($("#checkbox-id").attr("checked")) {  //可以attr换成prop
+    // do something
+}
+
+Query判断radio是否选中
+($("#checkbox-id").prop("checked")
+
+1.9.0 开始不建议使用 attr() 来对具有 true 和 false 两个属性的属性进行操作了。具有 true 和 false 两个属性的属性，如 checked, selected 或者 disabled 使用prop()，其他的使用 attr()
+
+
+-----------------------------------------
+
+判断数组中是否存在
+$.inArray(obj.value, aleadyModuleId)
+-----------------------------------------
+
+
+
+=================================== java ===============================
+
+-----------------------------------------
+map.containsKey 判断是否存在key 
+map.get("key") 
+map.get("value")
+-----------------------------------------
+
+
+=================================== mybatis ===============================
+
+-----------------------------------------
+<if test=" pageNo != null and pageNo != '' and pageSize != null and pageSize != '' "> 
+	LIMIT #{pageNo, jdbcType=INTEGER},#{pageSize, jdbcType=INTEGER}  
+</if>
+假如Interger参数为0 那么会默认为null 要加上 or ==0
+<if test=" (pageNo != null and pageNo != '' or pageNo ==0) and (pageSize != null and pageSize != '' or pageSize ==0)"> 
+	LIMIT #{pageNo, jdbcType=INTEGER},#{pageSize, jdbcType=INTEGER}  
+</if>
+-----------------------------------------
+
+mybatis:  新增的时候values写成value;导致调试了半天。
+-----------------------------------------
+
+查询的时候输入% 或 _都能全部查询，因为%和_是数据库的特殊字符，所以新增的时候把特殊字符屏蔽
+
+-----------------------------------------
+
+
+=================================== mysql===============================
+
+-----------------------------------------
+
+where in () 参数受max_allowed_packet 限制
+-----------------------------------------
+CASE WHEN a.answer_text = b.answer_text THEN 1 ELSE 0 END aa
+-----------------------------------------
+SELECT * FROM (SELECT f1,f2 FROM b JOIN c) AS tb
+即最后的AS tb是必须的（tb这个名称可以随意取），即指定一个别名。每个派生出来的新表都必须指定别名，否则在mysql中会报如下错误：ERROR 1248 (42000): Every derived TABLE must have its own alias
+ 另外，MySQL中INSERT INTO SELECT不能加VALUES，即不能写成如下形式：
+INSERT INTO db1_name(field1,field2) VALUES SELECT field1,field2 FROM db2_name
+这样写：
+INSERT INTO db1_name(field1,field2) SELECT field1,field2 FROM db2_name
+-----------------------------------------
+
+int(11)与int(3)的区别：int(M)这里的M代表的并不是存储在数据库中的具体的长度，以前总是会误以为int(3)只能存储3个长度的数字，int(11)就会存储11个长度的数字，这是大错特错的。
+
+其实当我们在选择使用int的类型的时候，不论是int(3)还是int(11)，它在数据库里面存储的都是4个字节的长度，
+
+在使用 int(3) zerofill 的时候如果你输入的是10，会默认给你存储位010
+
+也就是说这个3代表的是默认的一个长度，当你不足3位时，会帮你补全，当你超过3位时，就没有任何的影响（数据的存入，取出、展示都没有影响）。
+-----------------------------------------
+
+============================================项目遇到的===========================================
+
+-----------------------------------------
+
+今天发现2个bug, 一个是datasource.properties文件的jsbc.driverClassName的最后有一个空格
+		另一个是mapping.xml的resultType值写错写成resultMap的值
+
+-----------------------------------------
+ie11打印字体太大，打开浏览器后，在最上面的菜单栏里，点击“查看”→“文字大小”
+-----------------------------------------
+
+jsp: ${xx} 假如xx存在特殊字符，比如<、>。html会解析所以会报错. 用${fn:replace(xx, "<", "&lt;")}
+-----------------------------------------
+
+zDialog: 在url后面加上xxxx.html?xx=xxx 就可以在xxxx.html用js 获取xx的值：var xx = "${param.xx}"
+-----------------------------------------
+
+搜索的时候记得去掉两端空格。 
+----------------------------------------- 
+
+

@@ -1,0 +1,65 @@
+Redis持久化存储(AOF与RDB两种模式) http://blog.csdn.net/canot/article/details/52886923
+
+安装 http://blog.csdn.net/structur_e/article/details/53007275
+Redis配置文件详解 http://blog.csdn.net/neubuffer/article/details/17003909
+
+单机版：
+    1、安装gcc：yum install gcc-c++
+    2、解压安装包
+    3、make
+    4、make install PREFIX=/usr/local/redis （指定安装目录）
+    5、启动redis
+        --前端启动:安装目录下 ./redis-server
+        --后台启动：
+            1、复制redis.conf(安装包里面)到redis的安装目录
+            2、修改redis.conf。修改daemonize yes
+            3、[root@bogon redis]# ./redis-server redis.conf
+    6、客户端：
+        命令行:
+            redis-cli -p 端口 -h ip地址 <-c>连接集群时使用此参数
+                默认端口：6379 Ip：localhost（127.0.0.1）   
+
+            [root@bogon redis]# ./redis-cli
+            127.0.0.1:6379 > set a 100
+            127.0.0.1:6379 > get a
+            "100"
+            常见命令 incr:加1 decr:减1 del:删除 keys*:查询键
+        GUI客户端:
+            Redis Desktop Manager(只支持单机版不支持集群)
+    7、主从配置(集群不需要)：
+        修改redis.conf。slaveof 192.168.0.100 6379  (映射到主服务器上) http://www.cnblogs.com/liuling/p/2014-4-19-02.html 
+
+
+集群版：
+    1、修改redis.conf。修改port端口号
+    2、修改redis.conf。#cluster-enabled yes 去掉#号
+    3、需要一个ruby脚本。在redis源码文件夹下的src目录下。redis-trib.rb。把redis-trib.rb文件复制到到redis-cluster目录下。
+    4、执行ruby脚本之前，需要安装ruby环境。
+        -- yum install ruby
+        -- yum install rubygems
+        -- 安装redis-trib.rb运行依赖的ruby的包redis-3.0.0.gem。在依赖包目录下执行gem install redis-3.0.0.gem安装
+    5、启动redis
+    6、使用redis-trib.rb创建集群
+        -- ./redis-trib.rb create --replicas 1 192.168.25.153:7001 192.168.25.153:7002 192.168.25.153:7003 192.168.25.153:7004 192.168.25.153:7005  192.168.25.153:7006
+    7、客户端:redis-cli -p 7001 -c
+
+
+哨兵模式：自动监视Master节点，当前挂掉后，自动将Slaver节点变为Master节点
+    1、sentinel.conf配置文件，修改sentinel monitor host6379 127.0.0.1 6379 1，其它使用默认即可
+           host6379 主机名称，随便起    主机IP 端口 1表示选举，某个slaver得到超过1票则成成为Master节点
+    2、启动sentinel： ./redis-sentinel ../sentinel.conf
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

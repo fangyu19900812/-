@@ -1,0 +1,8 @@
+
+-put :上传文件到dfs
+	hadoop fs -put 文件名 目录
+	hadoop fs -put 123    /      
+
+-get :下载文件到dfs
+	hadoop fs -get 文件名   目录
+	hadoop fs -get /xxx/123  .     

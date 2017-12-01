@@ -1,0 +1,252 @@
+--window
+1、安装完成
+	$ git config --global user.name "Your Name"
+	$ git config --global user.email "email@example.com"
+	//注意git config命令的--global参数，用了这个参数，表示你这台机器上所有的Git仓库都会使用这个配置，当然也可以对某个仓库指定不同的用户名和Email地址。
+
+2、创建版本库
+	①、$ mkdir learngit //可以cd到你想要的目录。
+		$ cd learngit 
+		$ pwd	 //pwd命令用于显示当前目录。
+		/Users/michael/learngit
+		或者 可以在你想要的目录，右键点击Git Bash Here,弹窗命令框。此时命令框就是当前目录。
+
+	②、$ git init //初始化一个Git仓库
+		Initialized empty Git repository in xxx/.git/  //xxx你的目录。.git的目录，这个目录是Git来跟踪管理版本库的，没事千万不要手动修改这个目录里面的文件，不然改乱了，就把Git仓库给破坏了。如果你没有看到.git目录，那是因为这个目录默认是隐藏的
+	
+3、添加文件到Git仓库
+	①、$ git add <file>	//可反复多次使用，添加多个文件；
+		如：$ git add file1.txt
+			$ git add file2.txt file3.txt
+	②、$ git commit -m "add 3 files."	// -m后面输入的是本次提交的说明，可以输入任意内容，当然最好是有意义的，这样你就能从历史记录里方便地找到改动记录。
+	
+	③、git add
+		$ git add -A   // 添加所有改动
+		$ git add *     // 添加新建文件和修改，但是不包括删除
+		$ git add .    // 添加新建文件和修改，但是不包括删除
+		$ git add -u   // 添加修改和删除，但是不包括新建文件
+	
+	
+4、仓库当前的状态
+	$ git status //可以让我们时刻掌握仓库当前的状态,有文件被修改过
+		...
+		# modified:   readme.txt
+		#
+		no changes added to commit (use "git add" and/or "git commit -a")
+		//上面的命令告诉我们，readme.txt被修改过了，但还没有准备提交的修改。
+	
+	$ git diff //顾名思义就是查看difference，显示的格式正是Unix通用的diff格式。可以查看修改内容。 
+	$ git diff HEAD -- xxx.txt  //命令可以查看工作区和版本库里面最新版本的区别：
+	
+5、版本回退	
+	$ git log //命令显示从最近到最远的提交日志。如果嫌输出信息太多，看得眼花缭乱的，可以试试加上--pretty=oneline参数：$ git log --pretty=oneline。一大串类似123456...882e1e0的是commit id（版本号）
+			  //在Git中，用HEAD表示当前版本，也就是最新的提交3628164...882e1e0（注意我的提交ID和你的肯定不一样），上一个版本就是HEAD^，上上一个版本就是HEAD^^，当然往上100个版本写100个^比较容易数不过来，所以写成HEAD~100。
+	
+	$ git reset --hard HEAD^
+	
+	$ git reset --hard 123456 //只要知道commit id(如123456)，就可以回到指定版本。版本号没必要写全，前几位就可以了，Git会自动去找。当然也不能只写前一两位，因为Git可能会找到多个版本号，就无法确定是哪一个了。
+	
+	$ git reflog //用来记录你的每一次命令。可以查看历史命令，这样就不怕commit id找不到了。只要版本有提交说明，很好识别。
+		ea34578 HEAD@{0}: reset: moving to HEAD^ //回到上个版本，所以commit id=ea34578
+		123456  HEAD@{1}: commit: append GPL
+		ea34578 HEAD@{2}: commit: add distributed
+		cb926e7 HEAD@{3}: commit (initial): wrote a readme file
+	
+6、工作区和暂存区	
+	工作区（Working Directory） 
+		//就是你在电脑里能看到的目录，比如我的learngit文件夹就是一个工作区：
+		
+	版本库（Repository） 
+		//工作区有一个隐藏目录.git，这个不算工作区，而是Git的版本库。
+		//Git的版本库里存了很多东西，其中最重要的就是称为stage（或者叫index）的暂存区，还有Git为我们自动创建的第一个分支master，以及指向master的一个指针叫HEAD。
+		
+	管理修改
+		//第一次修改 -> git add -> 第二次修改 -> git commit
+		//当你用git add命令后，在工作区的第一次修改被放入暂存区，准备提交，但是，在工作区的第二次修改并没有放入暂存区，所以，git commit只负责把暂存区的修改提交了，也就是第一次的修改被提交了，第二次的修改不会被提交。
+		//提交后，用git diff HEAD -- readme.txt命令可以查看工作区和版本库里面最新版本的区别
+		
+	撤销修改
+		①、在 commit 前撤销 add:
+			$ git reset <file> // 撤销提交单独文件
+			$ git reset        // 
+			
+		②、add/commit 前撤销对文件的修改:
+			$ git checkout -- readme.txt  
+				// 注意, add添加后(同commit提交后)就无法通过这种方式撤销修改
+				//一种是readme.txt自修改后还没有被放到暂存区，现在，撤销修改就回到和版本库一模一样的状态；
+				//一种是readme.txt已经添加到暂存区后，又作了修改，现在，撤销修改就回到添加到暂存区后的状态。
+				//git checkout -- file命令中的--很重要，没有--，就变成了“切换到另一个分支”的命令，
+			
+			$ git reset HEAD readme.txt 
+				//用命令git reset HEAD file可以把暂存区的修改撤销掉（unstage），重新放回工作区： 不过前提是没有推送到远程库。
+				//git reset命令既可以回退版本，也可以把暂存区的修改回退到工作区。当我们用HEAD时，表示最新的版本。
+	
+	删除文件
+		$ rm test.txt
+		$ git status
+			//这个时候，Git知道你删除了文件，因此，工作区和版本库就不一致了，git status命令会立刻告诉你哪些文件被删除了
+			//现在你有两个选择，一是确实要从版本库中删除该文件，那就用命令git rm删掉，并且git commit：
+		$ git rm test.txt
+		$ git commit -m "remove test.txt"
+			//现在，文件就从版本库中被删除了。
+			//另一种情况是删错了，因为版本库里还有呢，所以可以很轻松地把误删的文件恢复到最新版本：
+		$ git checkout -- test.txt
+			//git checkout其实是用版本库里的版本替换工作区的版本，无论工作区是修改还是删除，都可以“一键还原”。
+	
+7、远程仓库	
+	①、创建SSH Key 
+		//在用户主目录下，看看有没有.ssh目录，如果有，再看看这个目录下有没有id_rsa和id_rsa.pub这两个文件，如果已经有了，可直接跳到下一步。如果没有，打开Shell（Windows下打开Git Bash），创建SSH Key：
+		$ ssh-keygen -t rsa -C "youremail@example.com"
+		//可以在用户主目录里找到.ssh目录，里面有id_rsa和id_rsa.pub两个文件，这两个就是SSH Key的秘钥对，id_rsa是私钥，不能泄露出去，id_rsa.pub是公钥，可以放心地告诉任何人。
+	
+	②、登陆GitHub，打开“Account settings”，“SSH and GPG keys”页面：
+		//点“Add SSH Key”，填上任意Title，在Key文本框里粘贴id_rsa.pub文件的内容：
+		//点“Add Key”，你就应该看到已经添加的Key：
+	
+	③、添加远程库
+		1、GitHub上创建一个Git仓库，最好和本地仓库名字一样
+		2、可以把一个已有的本地仓库与之关联
+			$ git remote add origin git@github.com:GitHub的账户名/xxxx.git //xxxx为仓库名  所使用的远程主机自动被Git命名为origin
+	
+	④、把本地库的所有内容推送到远程库上
+		$ git push -u origin master  
+			//把本地库的内容推送到远程，用git push命令，实际上是把当前分支master推送到远程。
+			//由于远程库是空的，我们第一次推送master分支时，加上了-u参数，Git不但会把本地的master分支内容推送的远程新的master分支，还会把本地的master分支和远程的master分支关联起来，在以后的推送或者拉取时就可以简化命令。
+			//当你第一次使用Git的clone或者push命令连接GitHub时，会得到一个警告。这是因为Git使用SSH连接，而SSH连接在第一次验证GitHub服务器的Key时，需要你确认GitHub的Key的指纹信息是否真的来自GitHub的服务器，输入yes回车即可。
+			
+		//从现在起，只要本地作了提交，就可以通过命令：
+		$ git push origin master
+		
+		//分布式版本系统的最大好处之一是在本地工作完全不需要考虑远程库的存在，也就是有没有联网都可以正常工作，而SVN在没有联网的时候是拒绝干活的！当有网络的时候，再把本地提交推送一下就完成了同步，真是太方便了！
+	
+	⑤、从远程库克隆
+		1、登陆GitHub，创建一个新的仓库，名字叫gitskills
+		2、创建时勾选Initialize this repository with a README，这样GitHub会自动为我们创建一个README.md文件。这样远程库已经准备好了
+		3、$ git clone git@github.com:GitHub的账户名/gitskills.git  //用命令git clone克隆到本地库
+	
+	⑥、一旦远程主机的版本库有了更新（Git术语叫做commit），需要将这些更新取回本地，这时就要用到git fetch命令
+		//将某个远程主机的更新，全部取回本地。
+		$ git fetch <远程主机名>
+		
+		//如果只想取回特定分支的更新，可以指定分支名。
+		$ git fetch <远程主机名> <分支名>
+	
+	⑦、取回远程主机某个分支的更新
+		$ git pull <远程主机名> <远程分支名>:<本地分支名>
+		
+		//比如，取回origin主机的next分支，与本地的master分支合并，需要写成下面这样。
+		$ git pull origin next:master
+		
+		//如果远程分支是与当前分支合并，则冒号后面的部分可以省略。
+		$ git pull origin next
+		
+		//上面命令表示，取回origin/next分支，再与当前分支合并。实质上，这等同于先做git fetch，再做git merge。
+		$ git fetch origin
+		$ git merge origin/next
+	
+8、分支管理
+	①、创建与合并分支
+		1、创建dev分支，然后切换到dev分支
+			$ git checkout -b dev  
+				//git checkout命令加上-b参数表示创建并切换，相当于以下两条命令：
+				$ git branch dev
+				$ git checkout dev
+				
+		2、用git branch命令查看当前分支：
+			$ git branch //git branch命令会列出所有分支，当前分支前面会标一个*号。
+	
+		3、把dev分支的工作成果合并到master分支上：
+			$ git merge dev //git merge命令用于合并指定分支到当前分支。 需要切换到其他分支
+			//合并完成后，就可以放心地删除dev分支了：
+			$ git branch -d dev //如果XXX分支有没有合并到当前分支的内容，需要把-d换成-D，另外不能删除当前checkout 的分支
+	
+		4、举例：初始条件：分支master、dev。文件file1.txt、file2.txt
+			①、master修改file1, 切换dev,修改file1，合并。             //结果还是dev修改的file1
+			②、master修改file1, add , 切换dev,修改file1，合并。       //结果还是dev修改的file1
+			③、master修改file1, add、commit, 切换dev,修改file1，合并。 //合并会报错。
+			③、master修改file1, add、commit, 切换dev,修改file1，add 、合并。 //合并会报错。提示需要commit后才能合并。只add不commit也不行
+			③、master修改file1, add、commit, 切换dev,修改file1，add 、commit、合并。 //commit合并后file1会显示冲突记录。 可以用$ git reset --merge 还原
+	
+	②、解决冲突	
+		只能手动修改。必须手动解决冲突后再提交。
+		用git log --graph命令可以看到分支合并图。
+	
+	③、分支管理策略
+		//通常，合并分支时，如果可能，Git会用Fast forward模式，但这种模式下，删除分支后，会丢掉分支信息。
+		$ git merge --no-ff -m "merge with no-ff" dev //请注意--no-ff参数，表示禁用Fast forward。因为本次合并要创建一个新的commit，所以加上-m参数，把commit描述写进去。
+	
+	④、Bug分支
+		//软件开发中，bug就像家常便饭一样。有了bug就需要修复，在Git中，由于分支是如此的强大，所以，每个bug都可以通过一个新的临时分支来修复，修复后，合并分支，然后将临时分支删除。
+		//当你接到一个修复一个代号101的bug的任务时，很自然地，你想创建一个分支issue-101来修复它，但是，等等，当前正在dev上进行的工作还没有提交：
+		//并不是你不想提交，而是工作只进行到一半，还没法提交，预计完成还需1天时间。但是，必须在两个小时内修复该bug，怎么办？幸好，Git还提供了一个stash功能，可以把当前工作现场“储藏”起来，等以后恢复现场后继续工作：
+		$ git stash
+	
+		//首先确定要在哪个分支上修复bug，假定需要在master分支上修复，就从master创建临时分支：
+		$ git checkout master
+		$ git checkout -b issue-101
+	
+		//现在修复bug，需要把“Git is free software ...”改为“Git is a free software ...”，然后提交：
+		$ git add readme.txt 
+		$ git commit -m "fix bug 101"
+	
+		//修复完成后，切换到master分支，并完成合并，最后删除issue-101分支：
+		$ git checkout master
+		$ git merge --no-ff -m "merged bug fix 101" issue-101
+		$ git branch -d issue-101
+		
+		//太棒了，原计划两个小时的bug修复只花了5分钟！现在，是时候接着回到dev分支干活了！
+		$ git checkout dev
+		$ git status
+		
+		//工作区是干净的，刚才的工作现场存到哪去了？用git stash list命令看看：
+		$ git stash list
+		stash@{0}: WIP on dev: 6224937 add merge
+	
+		//工作现场还在，Git把stash内容存在某个地方了，但是需要恢复一下，有两个办法：
+		//一是用git stash apply恢复，但是恢复后，stash内容并不删除，你需要用git stash drop来删除；
+		//另一种方式是用git stash pop，恢复的同时把stash内容也删了：
+		$ git stash pop
+	
+		//用git stash list查看，就看不到任何stash内容了：
+		$ git stash list
+	
+		//可以多次stash，恢复的时候，先用git stash list查看，然后恢复指定的stash，用命令：
+		$ git stash apply stash@{0}
+	
+	⑤、Feature分支
+		//添加一个新功能时，你肯定不希望因为一些实验性质的代码，把主分支搞乱了，所以，每添加一个新功能，最好新建一个feature分支，在上面开发，完成后，合并，最后，删除该feature分支。
+		$ git checkout -b feature-vulcan
+		$ git add vulcan.py
+		$ git commit -m "add feature vulcan"
+	
+		//切回dev，准备合并：
+		$ git checkout dev
+		
+		//一切顺利的话，feature分支和bug分支是类似的，合并，然后删除。
+		//接到上级命令，因经费不足，新功能必须取消！虽然白干了，但是这个分支还是必须就地销毁：
+		$ git branch -d feature-vulcan
+		error: The branch 'feature-vulcan' is not fully merged.
+		If you are sure you want to delete it, run 'git branch -D feature-vulcan'.
+		
+		//销毁失败。Git友情提醒，feature-vulcan分支还没有被合并，如果删除，将丢失掉修改，如果要强行删除，需要使用命令git branch -D feature-vulcan。
+		$ git branch -D feature-vulcan
+		Deleted branch feature-vulcan (was 756d4af).
+	
+	⑥、多人协作
+	
+9、标签管理	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
