@@ -4,8 +4,8 @@ master:
 	2、解压 hadoop
 	3、进入 hadoop解压后的文件夹 创建tmp文件夹，存放临时文件
 	4、进入 usr/local/src/hadoop-1.2.1/conf目录
-		修改master 
-			把localhost去掉加上masters
+		修改masters 
+			把localhost去掉加上master
 		修改slaves
 			把localhost去掉加上slave1换行slave2……有多少个slave就加多少个
 		修改core-site.xml
@@ -41,12 +41,13 @@ master:
 			//jdk目录 http://www.cnblogs.com/kerrycode/archive/2015/08/27/4762921.html
 			// http://blog.csdn.net/cx118118/article/details/54955620
 			export JAVA_HOME= /usr/local/src/jdkxxx
+	前4步和slave一样，可以先配置slave。然后再执行下面步骤。
 	5、进入 /etc目录		
 		修改hosts //配置hostname。访问可以用hostname不用ip
 			192.168.183.10 master
 			192.168.183.11 slave1
 			192.168.183.12 slave2
-		修改/sysconfig/network(永久生效)
+		修改/etc/sysconfig/network(永久生效)
 			HOSTNAME=localhost改成HOSTNAME=master
 		终端执行(只是临时生效、立即生效,重启失效)
 			# hostname	master
@@ -66,17 +67,17 @@ master:
 			# getenforce
 			Permissive //表示成功关闭
 	6、设置免密码远程登录ssh 没有的需要安装
-		# ssh-keygen
+		# ssh-keygen  //一直回车
 		# cd ~/.ssh/
 		# cp id_rsa.pub authorized_keys
 		复制slave公钥 id_rsa.pub里面的内容到master的autorized_keys
 		所有的slave公钥复制完成后把master的autorized_keys复制到各个slave
-		# scp -rp authorized_keys slave1:~/.ssh/
+		# scp -rp authorized_keys slave1:~/.ssh/   //scp -rp authorized_keys 192.168.183.11:~/.ssh/
 		//不需要密码就是设置成功
 		# ssh slave1 
-		# exit
+		# exit //退出
 		//报错masters: ssh: Could not resolve hostname masters: Name or service not known
-		把/usr/local/src/hadoop-1.2.1/conf里面的master删除重新创建一个 如果是slave报错就删除重建slaves
+		把/usr/local/src/hadoop-1.2.1/conf里面的masters删除重新创建一个 如果是slave报错就删除重建slaves
 	7、启动集群
 		进入 usr/local/src/hadoop-1.2.1/bin目录
 		//第一次启动需要格式化
@@ -99,7 +100,7 @@ slave:
 			192.168.183.10 master
 			192.168.183.11 slave1
 			192.168.183.12 slave2
-		修改/sysconfig/network(永久生效，重启生效、)
+		修改/etc/sysconfig/network(永久生效，重启生效、)
 			HOSTNAME=localhost改成HOSTNAME=slave1
 		终端执行(只是临时生效、立即生效,重启失效)
 			# hostname	slave1
@@ -112,14 +113,14 @@ slave:
 			# getenforce
 			Permissive //表示成功关闭
 	6、设置远程登录不需要密码
-		# ssh-keygen
+		# ssh-keygen //一直回车
 		# cd ~/.ssh/
 		# cp id_rsa.pub authorized_keys
 		复制slave公钥 id_rsa.pub里面的内容到master的autorized_keys
 		所有的slave公钥复制完成后把master的autorized_keys复制到各个slave
 		//不需要密码就是设置成功
 		# ssh master 
-		# exit
+		# exit //退出
 
 	7、启动集群
 		//master启动后
