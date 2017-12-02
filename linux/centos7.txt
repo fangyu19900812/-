@@ -1,0 +1,48 @@
+安装系统：https://jingyan.baidu.com/article/fd8044fade8ac35031137a82.html
+
+安装完成：
+ipv4：127.0.0.1
+假如安装系统的时候设置"网络和主机名称"
+1、查看任务管理器VMware DHCP Service 和 VMware NAT Servic服务启动没有
+没有设置"网络和主机名称"
+1、查看任务管理器VMware DHCP Service 和 VMware NAT Servic服务启动没有
+2、vi /etc/sysconfig/network-scripts/ifcfg-ens??  修改ONBOOT=yes
+想要改为静态ip：http://blog.csdn.net/youzhouliu/article/details/51175364
+
+换阿里源：
+1、备份
+    mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup
+
+2、下载新的CentOS-Base.repo 到/etc/yum.repos.d/
+
+    CentOS 5
+    wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-5.repo
+    CentOS 6
+    wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-6.repo
+    CentOS 7
+    wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
+    或者
+    curl -o /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
+
+3、之后运行yum makecache生成缓存
+    运行yum makecache 生成缓存，即yummakecache
+    此时可能会出现HTTP ERORR 404-Not Found Trying othermirror,原因可能是yum查找软件包
+  使用的过时的缓存（此时可能需要去cd/etc/yum.repos.d目录，找到过时的缓存，把它去掉），
+  清空更新之后，再次安装软件，问题消失，具体见如下指令：
+  yum clean all（等同于  yum cleanheaders ;  yum cleanpackages）;
+  yum  update；这之后，重新运行 yum makecache生成缓存，yummakecache主要目的是将服     务器上的软件包信息在本地缓存,以提高搜索安装软件的速度。
+
+
+一、配置防火墙，开启80端口、3306端口
+CentOS 7.0默认使用的是firewall作为防火墙，这里改为iptables防火墙。
+1、关闭firewall：
+systemctl stop firewalld.service #停止firewall
+systemctl disable firewalld.service #禁止firewall开机启动
+2、安装iptables防火墙
+yum install iptables-services #安装
+vi /etc/sysconfig/iptables #编辑防火墙配置文件
+
+systemctl restart iptables.service #最后重启防火墙使配置生效
+systemctl enable iptables.service #设置防火墙开机启动
+
+
