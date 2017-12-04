@@ -1,0 +1,11 @@
+﻿安装：
+	http://phantomjs.org/download.html
+	注意版本。还有安装的前提需要什么软件。
+	设置环境变量
+
+测试：
+	[root@localhost ~]# phantomjs 
+	phantomjs> 
+	Ctrl + c 组合键退出和 phantom.exit()；退出命令行
+
+	[root@localhost roottest]# phantomjs test.js
