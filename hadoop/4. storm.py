@@ -12,8 +12,18 @@ storm vs hadoop
 # hadoop使用磁盘作为交换介质，storm是内存运行。
 # storm吞吐不及hadoop,不适合批处理计算模型。
 
+主：nimbus
+从：supervisor
+spout相当于mr的jobTracker
+bolt相当于mr的taskTracker 是线程不是进程
 
+stream groupomg
+	shuffle groupong:随机分组 （常用）
+	fields groupong:按指定的field分组 按key分割分桶 （常用）
+	all groupong:广播分组
+	global groupong:全局分组
 
+ 
 
 
 
