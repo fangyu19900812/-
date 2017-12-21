@@ -1,7 +1,7 @@
 
 hadoop1.0
 ################################################
-################ 安装
+################ hadoop1.0集群搭建
 ################################################
 	master:
 		1、路径 usr/local/src/
@@ -61,15 +61,24 @@ hadoop1.0
 		注意：每次重启后都需要关闭（也可以设置永久关闭。）
 			关闭防火墙
 				# /etc/init.d/iptables stop （也可以只打开要试用的端口）
-				或：[root@djt002 ~]# chkconfig iptables off //永久关闭防火墙  [root@djt002 ~]# chkconfig iptables on //永久打开防火墙
-					[root@djt002 ~]# service iptables stop     //临时关闭防火墙
-					[root@djt002 ~]# service iptables status //查看防火墙状态
-					iptables: Firewall is not running.
-
+				[root@djt002 ~]# service iptables stop     //临时关闭防火墙
+				[root@djt002 ~]# service iptables status //查看防火墙状态
+				iptables: Firewall is not running.
+					
+			永久关闭防火墙
+				[root@djt002 ~]# chkconfig iptables off //永久关闭防火墙 
+				[root@djt002 ~]# chkconfig iptables on //永久打开防火墙
+				
 			关闭selinux
 				# setenforce 0
 				# getenforce
 				Permissive //表示成功关闭
+				
+			永久关闭selinux
+				# vim /etc/selinux/config
+					  #SELINUX=enforcing //注释
+					  #SELINUXTYPE=targeted //注释
+					  SELINUX=disable //新增
 		6、设置免密码远程登录ssh 没有的需要安装
 			# ssh-keygen  //一直回车
 			# cd ~/.ssh/
