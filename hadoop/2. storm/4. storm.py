@@ -14,14 +14,24 @@ storm vs hadoop
 
 主：nimbus
 从：supervisor
-spout相当于mr的jobTracker
+spout相当于mr的jobTracker 是线程不是进程
 bolt相当于mr的taskTracker 是线程不是进程
 
-stream groupomg
-	shuffle groupong:随机分组 （常用）
-	fields groupong:按指定的field分组 按key分割分桶 （常用）
-	all groupong:广播分组
-	global groupong:全局分组
+stream grouping
+		a1   b1
+		a2   b2
+	shuffle grouping:随机分组 （常用）
+		a1 -> b1
+		a2 -> b2
+	fields grouping:按指定的field分组 按key分割分桶 （常用）
+		a1 -> b2
+		a2 -> b1
+	all grouping:广播分组
+		a1 -> b1,b2
+		a2 -> b1,b2
+	global grouping:全局分组
+		a1 -> b1
+		a2 -> b1
 
  
 
