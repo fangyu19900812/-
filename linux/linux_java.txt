@@ -2,7 +2,7 @@
 centos 6.5 64位
 查看路径
 which java
-
+/usr/bin/java
 查看已经安装的JAVA版本信息
 java -version
 
@@ -11,7 +11,7 @@ rpm -qa | grep java
 rpm -qa | grep jdk
 rpm -qa | grep gcj
 
-卸载  非root提示权限不够
+卸载  非root提示权限不够（一般卸载noarch后缀的就行）
 yum -y remove java xxxxxxxxx
 或者rpm -e --nodeps xxxxxx
 

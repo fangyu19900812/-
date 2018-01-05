@@ -110,15 +110,19 @@ master:
 					  #SELINUX=enforcing //注释
 					  #SELINUXTYPE=targeted //注释
 					  SELINUX=disable //新增
-		6、设置免密码远程登录ssh 没有的需要安装
+		6、设置免密码远程登录ssh 没有的需要安装 
+			//注意当前的用户是谁不要弄错了。Permission denied (publickey,gssapi-keyex,gssapi-with-mic,password).
+											lost connection
+
 			# ssh-keygen  //一直回车
 			# cd ~/.ssh/
 			# cp id_rsa.pub authorized_keys
 			复制slave公钥 id_rsa.pub里面的内容到master的autorized_keys
 			所有的slave公钥复制完成后把master的autorized_keys复制到各个slave
 			# scp -rp authorized_keys slave1:~/.ssh/   //scp -rp authorized_keys 192.168.183.11:~/.ssh/
+			多用户  # scp -rp authorized_keys 用户@主机:~/.ssh/    //scp -rp authorized_keys slave@192.168.183.11:~/.ssh/
 			//不需要密码就是设置成功
-			# ssh slave1 
+			# ssh slave1   多用户 #ssh 用户@主机
 			# exit //退出
 			//报错masters: ssh: Could not resolve hostname masters: Name or service not known
 			把/usr/local/src/hadoop-1.2.1/conf里面的masters删除重新创建一个 如果是slave报错就删除重建slaves
