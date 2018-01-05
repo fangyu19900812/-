@@ -112,7 +112,26 @@ map.containsKey 判断是否存在key
 map.get("key") 
 map.get("value")
 -----------------------------------------
+前端传list给后台   @RequestBody
+前端：设置contentType: "application/json"
+	param={"id":1,"class":[{"name":"1班"},{"name":"2班"}]}
+	ajax: 
+		data:JSON.stringify(param),
+		contentType: "application/json"
+后台：设置@RequestBody
+	@RequestMapping("/xxx")
+	@ResponseBody
+	public String createTest(HttpServletRequest req,@RequestBody  School s)
 
+	School s{
+		Integer id;
+		List<ClassDto> class;
+		getter/setter
+	}
+	ClassDto c{
+		String name;
+		getter/setter
+	}
 
 =================================== mybatis ===============================
 
