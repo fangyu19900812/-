@@ -8,9 +8,9 @@ hadoop1.0
 		2、解压 hadoop
 		3、进入 hadoop解压后的文件夹 创建tmp文件夹，存放临时文件
 		4、进入 usr/local/src/hadoop-1.2.1/conf目录
-			修改masters 
+			修改masters
 				把localhost去掉加上master
-			修改slaves
+			修改slaves 
 				把localhost去掉加上slave1换行slave2……有多少个slave就加多少个
 			修改core-site.xml
 				<configuration>
@@ -91,7 +91,8 @@ hadoop1.0
 			# exit //退出
 			//报错masters: ssh: Could not resolve hostname masters: Name or service not known
 			把/usr/local/src/hadoop-1.2.1/conf里面的masters删除重新创建一个 如果是slave报错就删除重建slaves
-		7、启动集群
+			
+		7、启动集群 
 			进入 usr/local/src/hadoop-1.2.1/bin目录
 			//第一次启动需要格式化
 			# ./hadoop namenode -format

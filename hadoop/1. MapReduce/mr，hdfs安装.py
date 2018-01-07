@@ -26,28 +26,32 @@
 	
 master:
 		1、路径 usr/local/src/
-		2、解压 hadoop
+		2、解压 hadoop （多用户格式 用户名@主机名 如masters@local)
 		3、进入 hadoop解压后的文件夹 创建tmp文件夹，存放临时文件
 		4、进入 usr/local/src/hadoop-1.2.1/conf目录
-			修改masters 
+		
+			修改masters （多用户格式 用户名@主机名 如masters@local 当前用户的就不用加@主机名，比如用户是master就不用。 slave1就写master@主机名)
 				[master@master conf]$ vim master
 				把localhost去掉加上master
-			修改slaves
+				
+			修改slaves （多用户格式 用户名@主机名 如slave1@local 当前用户的就不用加@主机名，比如用户是slave1 就不用写slave@主机名。 slave2就写slave1@主机名)
 				[master@master conf]$ vim slaves
 				把localhost去掉加上slave1换行slave2……有多少个slave就加多少个
+				
 			修改core-site.xml
 				<configuration>
 				//临时文件
 					<property>
 						<name>hadoop.tmp.dir</name>
-						<value>/usr/local/src/hadoop-1.2.1/tmp</value>
+						<value>/usr/local/src/hadoop-1.2.1/tmp</value> //在此目录slave会被创建dfs和marped两个文件夹,master只有dfs
 					</property>
-				//namenode ip地址master ip地址
+				//namenode ip地址master ip地址 
 					<property>
 						<name>fs.default.name</name>
 						<value>hdfs://192.168.183.10:9000</value> 
 					</property>
 				</configuration>
+				
 			修改mapred-site.xml
 				<configuration>
 				//jobTracker 要http开头
@@ -56,6 +60,7 @@ master:
 						<value>http://192.168.183.10:9001</value>
 					</property>
 				</configuration>
+				
 			修改hdfs-site.xml
 				<configuration>
 				//配置hdfs副本数 默认3
@@ -64,10 +69,12 @@ master:
 						<value>3</value>
 					</property>
 				</configuration>
+				
 			修改hadoop-env.sh
 				//jdk目录 http://www.cnblogs.com/kerrycode/archive/2015/08/27/4762921.html
 				// http://blog.csdn.net/cx118118/article/details/54955620
 				export JAVA_HOME= /usr/local/src/jdkxxx
+				
 		前4步和slave一样，可以先配置slave。然后再执行下面步骤。
 		5、进入 /etc目录 需要root权限
 			cd /etc
@@ -122,7 +129,7 @@ master:
 			# scp -rp authorized_keys slave1:~/.ssh/   //scp -rp authorized_keys 192.168.183.11:~/.ssh/
 			多用户  # scp -rp authorized_keys 用户@主机:~/.ssh/    //scp -rp authorized_keys slave@192.168.183.11:~/.ssh/
 			//不需要密码就是设置成功
-			# ssh slave1   多用户 #ssh 用户@主机
+			# ssh slave1   多用户 #ssh 用户@主机 还有就是注意用户名是否规范
 			# exit //退出
 			//报错masters: ssh: Could not resolve hostname masters: Name or service not known
 			把/usr/local/src/hadoop-1.2.1/conf里面的masters删除重新创建一个 如果是slave报错就删除重建slaves
