@@ -178,7 +178,7 @@ master:
 			# exit //退出
 
 		7、启动集群
-			//master启动后
+			//master启动后 slave自动启动
 			# jps
 			111 TaskTracker
 			112 Jps
