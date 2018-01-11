@@ -31,6 +31,7 @@ master:
 		4、进入 usr/local/src/hadoop-1.2.1/conf目录
 		
 			修改masters （多用户格式 用户名@主机名 如masters@local 当前用户的就不用加@主机名，比如用户是master就不用。 slave1就写master@主机名)
+				不加上masters时SecondaryNameNode不启动
 				[master@master conf]$ vim master
 				把localhost去掉加上master
 				
