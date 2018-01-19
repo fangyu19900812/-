@@ -6,7 +6,8 @@
 2、Fiel 归并排序
 	block
 	dfs.block.size设置block大小默认64M
- 
+2.1、split
+	http://blog.csdn.net/dr_guo/article/details/51150278
 3、inputFormat接口(java开发的)
     mr框架基础类之一
         数据分割split(划分)  map个数依赖split个数
