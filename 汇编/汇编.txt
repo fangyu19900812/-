@@ -146,11 +146,56 @@
 	  ├- pop ax
 	  └- // 把栈顶的值移出栈，送入ax中。
 
+32位 0 - FFFFFFFF	
+	EAX:扩展 累加 寄存器 
+	EBX:扩展 基址 寄存器
+	ECX:扩展 计数 寄存器
+	EDX:扩展 数据 寄存器
+	ESI:扩展 来源 寄存器
+	EDI:扩展 目标 寄存器
+除了以下三个其他随便用
+	EBP:扩展 基址指针标 寄存器	
+		-用于栈和栈帧
+	ESP:扩展 堆栈指针 寄存器
+		-指向当前进程的栈空间地址
+	EIP:扩展 指令指针 寄存器	
+		-指向下一条要被执行的指令
+		
+所有返回值都是存放在EAX	
+
+CALL: 
+	CALL xxx: 等于push eip; jmp xxx;
+	CALL 404000h: //直接跳到函数或过程的地址
+	CALL eax: 函数或过程地址存放在eax
+	CALL dword ptr [eax]:
+		- dword 表示4个字节
+		- [eax] 表示 eax的值作为地址
+	CALL dword ptr [<&API>]: 系统API
+	
+CMP：
+	CMP  dest, src
+		比较dest和src的值，设置C/O/Z标志位
+		src-dest==0 Z=1, 否则z=0
+	
+	Z(0标志)：运算结果为0，Z=1否则z=0
+	o(溢出标志)：运行过程,超出机器表示范围称为溢出，OF=1，否则OF=0
+	C(进位标志)：记录运算时从最高位有效位产生的进位值，有进位C=1，否则C=0
+	
+逻辑运算
+	AND 有0则0
+	OR 有1则1
+	XOR 异或 不同为1 相同为0
+	NOT 1为0 0为1
+	
+test指令:
+	test dest,src
+		和and一样,对两个操作数进行按位与运算 将结果保存到dest
+
+	test eax,eax //99%是这样
+		如果eax=0 Z标志位=1
 	
 	
-	
-	
-	
+	004B07B0
 	
 	
 	
