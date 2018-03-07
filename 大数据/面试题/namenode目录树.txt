@@ -1,0 +1,276 @@
+
+namedoe维护元数据的目录树，请简单介绍一下目录树
+
+NameNode会为维护文件系统的命名空间，命名空间是以/目录为开始的整棵目录树，整棵目录树是通过FSDirectory来管理的。
+
+在HDFS中，无论是目录还是文件都是，在文件系统目录树中都被看做是一个INode节点，如果是目录则对应的类是INodeDirectory，如果是文件，则对应的类是INodeFile. INodeDirectory包含一个children集合，其子目录或者文件会被保存在这个集合中
+
+ 
+
+HDFS会将命名空间保存到NameNode的本地文件系统上一个叫fsimage的文件中。利用这个文件，NameNode每次重启的时候都能将整个HDFS的命名空间重构，fsimage是由FSImage来负责的。另外对HDFS的操作，NameNode都会早操作日志editlog中进行记录，以便于周期性的将该日志与fsImage进行合并生成新的fsimage。该日志文件也在文件系统保存叫做editlog，有FSEditLog类来管理
+
+一 INode分析
+
+INode是HDFS中目录和文件的抽象。主要保存了一些文件和目录的元数据信息，比如当前文件或者目录的父INode的引用，名字, 用户组，访问权限，最后修改时间，完整的路径名等。
+
+INode实现了INodeAttributes接口：
+
+userName:文件/目录所属用户名
+
+groupName:所属用户组
+
+fsPermission:文件或者目录权限
+
+modificationTime:上次修改时间
+
+INode就只有一个字段parent，持有父类INode引用
+
+ 
+
+ 
+
+三 FSEditlog分析
+
+在NameNode中，命名空间(文件系统目录树，文件元数据信息)都是保存在内存中的，一旦NameNode重启或者宕机，内存中的所有数据将会全部丢失，所以必须有一种机制将整个命名空间持久化。
+
+FSEidtLog用于管理editlog文件。和fsimage文件不同，editlog文件会随着NameNode的运行实时更新，所以FSEditLog的实现依赖于底层的输入流和输出流。
+
+3.1 transactionId机制
+
+Editlog可以存放在多种容器中，文件系统或者NFS,Bookkeeper等。
+
+而管理这些不同容器内文件的方法也有很多，目前HDFS采用是基于
+
+transactionId的日志管理方法
+
+transactionId与客户端每次发起的RPC操作相关，当客户端发起一次RPC请求对NameNode的命名空间修改后，NameNode就会在editlog
+
+中发起一个新的transaction用于记录这次操作。每一个transaction会用一个唯一的transactionid标志
+
+edit文件的命名是以edits_开始的事务id-结束的事务id,这个文件保存了开始事务到结束事务之间的事务所有操作都在这个文件。
+
+edits_inprogress_开始的事务id:表示正在处理的editlog
+
+fsimage_结束事务id:fsimage文件是hadoop文件系统元数据的一个永久性的检查点，包含hadoop文件系统中结束事务id前的完整HDFS命名空间元数据镜像，比如fsimage_00000000031就是fsimage_0000
+
+0030与edits_00000000031-00000000031合并后的镜像文件。
+
+Seen_txid:这个文件中保存了上一个checkpoint以及editlog重置时最新的事务id.
+
+ 
+
+3.2 FSEditLog状态
+
+包括5个状态：
+
+UNINITIALIZED:edit初始状态
+
+BETWEEN_LOG_SEGMENTS:editlog的前一个segment已经关闭，新的还没开始
+
+IN_SEGMENT:editlog处于可编辑状态
+
+OPEN_FOR_READING:editlog处于可读状态
+
+CLOSED:editlog处于关闭状态
+
+ 
+
+对于非HA机制的情况，FSEditLog应该开始于UNINITIALIZED或者CLOSED状态
+
+FSEditLog初始化之后进入BETWEEN_LOG_SEGMENTS状态，表示前一个segment已经关闭，新的还没开始，日志已经准备好了。当打开日志服务时，改变FSEditLog状态为IN_SEGMENT状态，表示可以写editlog了。
+
+ 
+
+3.3 EditLogOutputStream
+
+FSEditLog类会调用FSEditLog.editLogStream字段的write方法在editlog文件中记录一个操作，数据会被先写入到editlog文件输出流的缓存中，FSEditLog类会调用editLogStream.flush()将数据同步到磁盘上。
+
+ 
+
+ 
+
+四 FSImage分析
+
+如果NameNode实时的将内存中的元数据实时同步到fsimage文件中，将会非常消耗资源且造成NameNode运行缓慢，所以NameNode会先将命名空间的修改操作保存在editlog文件中，然后定期合并fsimage和editlog文件
+
+FSImage主要功能：
+
+保存命名空间，加载fsimage文件，加载editlog
+
+ 
+
+4.1保存命名空间
+
+privatesynchronized voidsaveFSImageInAllDirs(FSNamesystemsource,NameNodeFile nnf, long txid, Canceler canceler)
+
+throwsIOException {
+
+    StartupProgressprog = NameNode.getStartupProgress();
+
+    prog.beginPhase(Phase.SAVING_CHECKPOINT);
+
+    if (storage.getNumStorageDirs(NameNodeDirType.IMAGE) ==0) {
+
+      throw newIOException("No image directories available!");
+
+    }
+
+    if (canceler ==null) {
+
+      canceler = new Canceler();
+
+    }
+
+    //构造保存命名空间上下文
+
+    SaveNamespaceContextctx = newSaveNamespaceContext(
+
+       source, txid,canceler);
+
+    /*
+
+     * NameNode可以定义多个fsimage存储路径，对于每一个存储路径
+
+     * saveFSImageInAllDirs方法会启动一个线程负责在这个路径上
+
+     *保存fsimage文件；同时为了防止保存过程中出现错误，命名空间
+
+     *信息首先会被保存在fsimage.ckpt文件中，当保存操作全部完成
+
+     *之后，才会将fsimage.ckpt重命名为fsimage文件
+
+     */
+
+    try {
+
+      List<Thread> saveThreads =new ArrayList<Thread>();
+
+      //在每一个保存路径上启动一个线程，该线程使用FSImageSaver类保存fsimage文件
+
+      for (Iterator<StorageDirectory>it
+
+             =storage.dirIterator(NameNodeDirType.IMAGE);it.hasNext();) {
+
+        StorageDirectorysd = it.next();
+
+        FSImageSaversaver = newFSImageSaver(ctx,sd, nnf);
+
+        ThreadsaveThread = newThread(saver,saver.toString());
+
+       saveThreads.add(saveThread);
+
+       saveThread.start();
+
+      }
+
+      //等待所有线程执行完毕
+
+      waitForThreads(saveThreads);
+
+      saveThreads.clear();
+
+      storage.reportErrorsOnDirectories(ctx.getErrorSDs());
+
+ 
+
+      if (storage.getNumStorageDirs(NameNodeDirType.IMAGE) ==0) {
+
+       throw newIOException(
+
+         "Failed to save in any storagedirectories while saving namespace.");
+
+      }
+
+      if (canceler.isCancelled()) {
+
+       deleteCancelledCheckpoint(txid);
+
+       ctx.checkCancelled();// throws
+
+       assert false :"shouldhave thrown above!";
+
+      }
+
+      //将fsimage.ckpt改名为fsimage
+
+      renameCheckpoint(txid,NameNodeFile.IMAGE_NEW,nnf, false);
+
+ 
+
+      // 因为现在有了新的保存点，那么可以将存储上的一部分editlog和fsimage删除
+
+      purgeOldStorage(nnf);
+
+    } finally {
+
+      // Notify any threads waiting on the checkpoint to becanceled
+
+      // that it is complete.
+
+      ctx.markComplete();
+
+      ctx = null;
+
+    }
+
+    prog.endPhase(Phase.SAVING_CHECKPOINT);
+
+  }
+
+voidsaveFSImage(SaveNamespaceContextcontext, StorageDirectorysd,
+
+      NameNodeFiledstType) throws IOException {
+
+    //获取一个事务id
+
+    long txid =context.getTxId();
+
+    //获取fsimage文件
+
+    FilenewFile = NNStorage.getStorageFile(sd, NameNodeFile.IMAGE_NEW,txid);
+
+    FiledstFile = NNStorage.getStorageFile(sd,dstType, txid);
+
+    //保存FSImage
+
+    FSImageFormatProtobuf.Saversaver = new FSImageFormatProtobuf.Saver(context);
+
+    FSImageCompressioncompression = FSImageCompression.createCompression(conf);
+
+    saver.save(newFile,compression);
+
+   
+
+    MD5FileUtils.saveMD5File(dstFile,saver.getSavedDigest());
+
+    storage.setMostRecentCheckpointInfo(txid, Time.now());
+
+  }
+
+4.2加载fsimage
+
+当NameNode启动的时候，会加载fsimage文件中保存的命名空间到NameNode内存，然后再一条一条的将editLog文件记录的更新加载并合并到命名空间。
+
+接下来NameNode会等待各个DataNode向自己会报数据块信息来组装blockMap
+
+NameNode每次启动的时候都会调用FSImage.loadFSImage方法执行加载fsimage和editlog文件。
+
+ 
+
+五 FSDirecotry分析
+
+NameNode最重要的两个功能之一就是维护整个文件系统的目录树。HDFS的命名空间是通过FSDirectory来管理的，FSNameSystem也提供了目录树的管理功能，但是还是调用的FSDirecotry的方法，FSNameSystem在FSDirecotry的基础上添加了editlog日志记录功能，而FSDirectory的操作则全部是在内存中进行的，并不进行editlog的日志记录。
+
+常见的增删改功能
+
+addChild:向目录树添加子节点
+
+addBlock：添加数据块
+
+setOwner：设置文件所有者
+
+
+
+http://blog.csdn.net/zhanglh046/article/details/78599389
+http://lib.csdn.net/article/operatingsystem/23677
+http://blog.51cto.com/2475816/1741934

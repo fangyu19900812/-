@@ -1,0 +1,35 @@
+HDFS的设计目标
+	非常巨大的分布式文件系统
+	运行在普通廉价的硬件上
+	易扩展、为用户提供性能不错的文件存储服务
+	
+HDFS架构
+
+1个Master(NameNode简称NN) 带 N个Slaves(DataNode简称DN)
+HDFS/YARN/HBase
+
+1个文件会被拆分多个Block
+blocksize:128M
+130M ==> 2个Block:128M和2M
+
+NN:
+1) 负责客户端请求响应
+2) 负责元数据(文件的名称、副本系数、Block存放的DN)的管理
+
+DN:
+1) 存储用户的文件对应的数据库(Block)
+2）要定期向NN发送心跳信息，汇报本身及其所有的block信息，健康状况
+
+Hadoop伪分布式安装步骤
+	1) jdk安装
+		解压:#tar -zxvf jdk-xxx-linux-x64.tar.gz -C ~/app
+		添加到系统环境变量:
+			#~/.bash_profile
+			export JAVA_HOME=/home/hadoop/app/jdkxxx
+			export PATH=$JAVA_HOME/bin:$PATH
+		使环境变量生效:#source ~/.bash_profile
+		验证java是否配置成功:#java -v
+	2) 安装ssh
+		sudo yum install ssh
+	………………………………省略
+		

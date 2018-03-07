@@ -1,0 +1,34 @@
+4.3. mapreduce数据压缩
+4.3.1 概述
+这是mapreduce的一种优化策略：通过压缩编码对mapper或者reducer的输出进行压缩，以减少磁盘IO，提高MR程序运行速度（但相应增加了cpu运算负担）
+1、Mapreduce支持将map输出的结果或者reduce输出的结果进行压缩，以减少网络IO或最终输出数据的体积
+2、压缩特性运用得当能提高性能，但运用不当也可能降低性能
+3、基本原则：
+运算密集型的job，少用压缩
+IO密集型的job，多用压缩
+
+4.3.2 MR支持的压缩编码
+
+压缩格式	工具	算法		文件扩展名	多文件	可分割性
+DEFLATE	  	无	DEFLATE		.deflate	不	不
+gzip		gzip	DEFLATE		.gz		不	不
+ZIP		zip	DEFLATE		.zip		是	是，在文件范围内
+bzip2		bzip2	bzip2		.bz2		不	是
+LZO		lzop	LZO		.lzo		不	是
+
+4.3.3 Reducer输出压缩
+在配置参数或在代码中都可以设置reduce的输出压缩
+1、在配置参数中设置 
+mapreduce.output.fileoutputformat.compress=false
+mapreduce.output.fileoutputformat.compress.codec=org.apache.hadoop.io.compress.DefaultCodec
+mapreduce.output.fileoutputformat.compress.type=RECORD
+
+4.3.4 Mapper输出压缩
+在配置参数或在代码中都可以设置reduce的输出压缩
+1、在配置参数中设置 
+mapreduce.map.output.compress=false
+mapreduce.map.output.compress.codec=org.apache.hadoop.io.compress.DefaultCodec
+
+
+4.3.5 压缩文件的读取
+Hadoop自带的InputFormat类内置支持压缩文件的读取，比如TextInputformat类，在其initialize方法中：

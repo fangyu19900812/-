@@ -1,0 +1,25 @@
+
+1、环境参数
+	Linux:CentOS6.4
+	Hadoop:CDH5.7
+	开发工具:IDEA、eclipse、myeclipse
+	
+2、大数据生态圈
+	Hadoop生态圈
+	Spark生态圈
+	
+3、大数据4V特征
+	Volume(大量数据)  	 		↑   Variety(多样数据类型)
+							   ← →
+	Velocity(快速数据流转)	    ↓   Value(数据价值)
+	
+4、大数据涉及的技术
+	数据采集
+	数据存储
+	数据处理/分析/挖掘
+	可视化
+	
+5、google大数据技术
+	MapReduce
+	BigTable ->hbase
+	GFS -> hdfs
