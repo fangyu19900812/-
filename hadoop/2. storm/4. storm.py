@@ -14,8 +14,18 @@ storm vs hadoop
 
 主：nimbus
 从：supervisor
-spout相当于mr的jobTracker 是线程不是进程
-bolt相当于mr的taskTracker 是线程不是进程
+spout相当于mr的jobTracker 但spout是线程不是进程
+bolt相当于mr的taskTracker 但bolt是线程不是进程
+storm进程叫worker MR进程叫child
+storm任务叫Topology MR任务叫job
+
+任务不需要nimbus来运行，需要supervisor
+
+nimbus和supervisor 协调都通过zookeeper完成
+
+storm 并行度
+http://blog.csdn.net/qq_37095882/article/details/77624340
+ 
 
 stream grouping
 		a1   b1

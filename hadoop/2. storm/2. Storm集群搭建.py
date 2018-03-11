@@ -48,7 +48,7 @@
 4、运行项目
 	把java程序打成jar包：比如一个名称为chengxu工程打包成名称为dabaochengxu.jar
 	python apache-storm-0.9.3/bin/storm jar ./dabaochengxu.jar chengxu.start remote
-	python storm目录 jar ./打的jar包 项目的启动方法main 传参参数
+	python storm目录 jar ./打的jar包 项目名称.启动类 传参参数
 	
 	
 
