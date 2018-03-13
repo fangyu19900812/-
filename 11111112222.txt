@@ -1,0 +1,9 @@
+ls -rlt
+cat merge_file.data | python map_tf.py mapper_func idf.data | uniq | sort | uniq
+cat idf.data | awk -F' ''{print $1} | sort | uniq | wc -l
+cat idf.data | awk -F' ''{print $1} | sort | uniq -c | awk '($1!=1){print $0}'
+tail -f tf_idf.data  //一直滚动
+du -sh tf_idf.data  //大小
+watch -n 0.5 du -sh tf_idf.data  //每0.5秒刷新一次大小
+cat tf_idf.data | sort -k3 -nr | head //第三列数字按大小排序，取前10行
+
