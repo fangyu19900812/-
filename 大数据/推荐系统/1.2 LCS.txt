@@ -31,11 +31,30 @@
     需要找到规律，并且规律可以迭代
     
     最长公共子序列Z = LCS(X,Y) X,Y为序列
+	
+	例子:
+		字符串X，长度m,从1开始数
+		字符串Y，长度n,从1开始数
+		Xi = <X1...Xm> 	
+		Yj = <Y1...Yn>
+		
+		X = B D C A B...
+		Y = A B C B D...
+		LCS(X,Y)为字符串X,Y的最长公共子序列,即Z = <Z1,Z2...Zk>
+		如果Xm = Yn(最后一个字符相同),则：Xm与Yn的最长公共子序列Zk的最后一个字符必定为Xm(=Yn)
             
-            
-            
-            
-            
+        Zk = Xm = Yn   
+		LCS(Xm,Yn) = LCS(Xm-1,Yn-1)+Xm
+		
+		如果Xm = Yn:
+			X3 = Y3 = C 那么LCS(BDC,ABC) = LCS(BD,AB) + C
+			X5 = Y4 = B 那么LCS(BDCAB,ABCB) = LCS(BDCA,ABC) + B
+		
+        如果Xm != Yn:
+			则 LCS(Xm,Yn) = LCS(Xm-1,Yn)或者 LCS(Xm,Yn) = LCS(Xm,Yn-1)
+			即 LCS(Xm,Yn) = max{LCS(Xm-1,Yn),LCS(Xm,Yn-1)}
+			X2 != Y2, LCS(BD,AB) = max{LCS(B,AB),LCS(BD,A)}
+			X4 != Y5, LCS(BDCA,ABCBD) = max{LCS(BDC,ABCBD),LCS(BDCA,ABCB)}
             
             
             
