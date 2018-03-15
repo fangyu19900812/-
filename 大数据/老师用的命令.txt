@@ -1,4 +1,8 @@
-ls -rlt
+linux
+	tail 文件名
+	cat 文件名 | sort -k2 -nr > 文件名
+	head 文件名
+	ls | wc -l 文件个数包括文件夹ls -rlt
 cat merge_file.data | python map_tf.py mapper_func idf.data | uniq | sort | uniq
 cat idf.data | awk -F' ''{print $1} | sort | uniq | wc -l
 cat idf.data | awk -F' ''{print $1} | sort | uniq -c | awk '($1!=1){print $0}'
