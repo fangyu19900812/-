@@ -55,6 +55,9 @@
 			即 LCS(Xm,Yn) = max{LCS(Xm-1,Yn),LCS(Xm,Yn-1)}
 			X2 != Y2, LCS(BD,AB) = max{LCS(B,AB),LCS(BD,A)}
 			X4 != Y5, LCS(BDCA,ABCBD) = max{LCS(BDC,ABCBD),LCS(BDCA,ABCB)}
+           
+        LCS(Xm,Yn) = 当Xm = Yn: LCS(X(m-1),Y(n-1)) + Xm 
+                     当Xm != Yn: max{LCS(X(m-1),Yn),LCS(Xm,Y(n-1))}
             
             
             
