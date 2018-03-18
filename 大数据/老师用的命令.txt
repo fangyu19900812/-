@@ -10,4 +10,28 @@ tail -f tf_idf.data  //一直滚动
 du -sh tf_idf.data  //大小
 watch -n 0.5 du -sh tf_idf.data  //每0.5秒刷新一次大小
 cat tf_idf.data | sort -k3 -nr | head //第三列数字按大小排序，取前10行
+cat auc.raw | sort -t$'\t' -k2g |awk -F'\t' '($1==-1){++x;a+=y;}($1==1){++y;}END{print 1.0-a/(x*y);}'
+
+conda install -y -c https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/ tensorflow=1.2
+conda install -y -c https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/ scipy scikit-learn h5py matplotlib Pillow requests psutil tensorflow=1.2
+conda create -n py27tf python=2.7 -y -c https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/ 
+
+数据源https://www.csie.ntu.edu.tw/~cjlin/libsvmtools/datasets/
+http://scikit-learn.org/stable/auto_examples/tree/plot_tree_regression.html#sphx-glr-auto-examples-tree-plot-tree-regression-py 
+http://scikit-learn.org/stable/auto_examples/cluster/plot_mean_shift.html#sphx-glr-auto-examples-cluster-plot-mean-shift-py 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

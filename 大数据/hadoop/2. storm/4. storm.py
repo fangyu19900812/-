@@ -16,9 +16,11 @@ storm vs hadoop
 从：supervisor
 spout相当于mr的jobTracker 但spout是线程不是进程
 bolt相当于mr的taskTracker 但bolt是线程不是进程
-storm进程叫worker MR进程叫child
+storm进程叫worker MR进程叫child   不会结束，除非主动kill
 storm任务叫Topology MR任务叫job
-
+基本单位
+	storm:tuple
+	hdfs:block
 任务不需要nimbus来运行，需要supervisor
 
 nimbus和supervisor 协调都通过zookeeper完成
@@ -43,10 +45,17 @@ stream grouping
 		a1 -> b1
 		a2 -> b1
 
- 
 
+LocalCluster cluster = new LocalCluster();
+cluster.submitTopology(TOPOLOGY_NAME, config, builder.createTopology());
 
+就不需要运行zookeeper，nimbus，supervisor，在storm ui也不会显示topology，因为是本地模拟。
 
+如果用下面方式：
+[Actionscript3] 纯文本查看 复制代码
+StormSubmitter.submitTopology(TOPOLOGY_NAME, config, builder.createTopology());
+
+则需要启动zookeeper，nimbus，supervisor，会在storm ui显示
 
 
 
