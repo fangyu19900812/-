@@ -27,11 +27,9 @@
         
     缺点:时间复杂度O(2^m*2^n)     
 
-动态规划法(面试有问)：   
-    需要找到规律，并且规律可以迭代
+动态规划法(面试有问)： 需要找到规律，并且规律可以迭代
     
-    最长公共子序列Z = LCS(X,Y) X,Y为序列
-	
+最长公共子序列Z = LCS(X,Y) X,Y为序列
 	例子:
 		字符串X，长度m,从1开始数
 		字符串Y，长度n,从1开始数
@@ -56,8 +54,15 @@
 			X2 != Y2, LCS(BD,AB) = max{LCS(B,AB),LCS(BD,A)}
 			X4 != Y5, LCS(BDCA,ABCBD) = max{LCS(BDC,ABCBD),LCS(BDCA,ABCB)}
            
-        LCS(Xm,Yn) = 当Xm = Yn: LCS(X(m-1),Y(n-1)) + Xm 
+        LCS(Xm,Yn) = 当Xm = Yn: LCS(X(m-1),Y(n-1)) + 1 
                      当Xm != Yn: max{LCS(X(m-1),Yn),LCS(Xm,Y(n-1))}
+
+
+练习：
+两个字串的LCS：连续的和不连续的，并且输出
+多个字串的LCS：连续的和不连续的，并且输出
+http://blog.csdn.net/u013074465/article/details/45392687
+http://blog.csdn.net/lisonglisonglisong/article/details/41596309
             
             
             
