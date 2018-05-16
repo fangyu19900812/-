@@ -57,6 +57,9 @@ StormSubmitter.submitTopology(TOPOLOGY_NAME, config, builder.createTopology());
 
 则需要启动zookeeper，nimbus，supervisor，会在storm ui显示
 
+wordcount在eclipse打印不了system.out.print信息用这个
+https://blog.csdn.net/the_conquer_zzy/article/details/78771367
+
 
 
 
