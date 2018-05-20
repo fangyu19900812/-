@@ -1,14 +1,10 @@
 
 版本：zookeeper-3.4.5
 
-persistent node:永久有效的节点 除非client删除
-ephemeral node: 临时节点，仅在client保持连接期间有效。
-sequence node: 顺序节点。client申请该节点是，zk会在节点末尾添加递增序号。
-4种节点 p、e、ps、es
-
+https://blog.csdn.net/beitiandijun/article/details/41802835
 1、解压zookeeper-3.4.5.tar.gz
 
-2、在解压文件夹下创建myid, 内容填写0，每个节点都要不一样。
+2、在解压文件夹下创建data目录、创建myid文件, 内容填写0，每个节点都要不一样。
 
 3、进入conf文件夹，若没有zoo.cfg则创建zoo.cfg 或者把zoo_simple.cfg改个名
 	vim zoo.cfg
@@ -31,21 +27,7 @@ sequence node: 顺序节点。client申请该节点是，zk会在节点末尾添
 	./zkServer.sh start  启动，jps会看到QuorumPeerMain进程 如果是HQuorumPeer就是HBase启动的zk
 	./zkServer.sh status  查看主从，leader主，follow从，如果没有显示就是启动不成功 
 	./zkServer.sh stop 停止
-		
 
-5、进入bin目录，执行客户端，数据都是同步的
-	./zkCli.sh
-	create /test "123"  创建节点"123"是数据
-	get /test  获取节点数据及信息
-	set /test "456" 修改节点数据
-	ls /  当前目录节点
-	create -s /test "123" 创建顺序节点 会在test后面加上序号:test001 序号会一直往上加，即使删除了某个节点
-	create -e /test "123" 创建临时节点
-	rmr /test 删除节点,可以删路径
-	delete /test 删除节点,？？只能删一个节点？？
-
-	https://blog.csdn.net/catoop/article/details/50848555
-	java - ZooKeeper中一共由三种方法可以实现Watch，分别为getData、exists和getChildren
 
 
 

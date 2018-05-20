@@ -3,24 +3,27 @@
 前置：java、python、zookeeper
 1、解压apache-storm-0.9.3.tar.gz
 
-2、进入apache-storm-0.9.3/conf目录
+2、进入apache-storm-0.9.3/conf目录 
+	注意一点是：配置条目的每个冒号后面要有一个空格
+	注意一点是：配置条目的每个冒号后面要有一个空格
+	注意一点是：配置条目的每个冒号后面要有一个空格
 	修改storm.yaml
 		zookeeper服务host也可以写ip
-		storm.zookeeper.servers:
+		storm.zookeeper.servers: 
 			- "master"
 			- "slave1"
 			- "slave2"
 			如果Zookeeper集群使用的不是默认端口，那么还需要storm.zookeeper.port选项。	
-		nimbus.host:"master"   
-		supervisor.slots.ports:  最多5个端口 几个port就几个work
-			- 6700
-			- 6701
-			- 6702
-			- 6703
-			- 6704
+		nimbus.host: "master"   
+		supervisor.slots.ports:  最多5个端口 几个port就几个work进程
+		    - 6700
+		    - 6701
+		    - 6702
+		    - 6703
+		    - 6704
 			注意一点是：配置条目的冒号后面要有一个空格，下面的对应值横杠两侧都要有空格，前面可以多输入几个，注意这些细节可以避免很多错误
 		storm.local.dir: "/home/admin/storm/workdir" 需要提前创建
-		Ui.port
+		ui.port: 8080
 		
 3、启动（是用python启动的，框架是java开发 bin是python写的，每台storm都要启动）
 	#bash run.sh
